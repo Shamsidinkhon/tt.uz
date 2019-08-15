@@ -23,7 +23,7 @@ namespace tt.uz.Services
 
         public IEnumerable<Category> GetAll()
         {
-            return _context.Category;
+            return _context.Categories;
         }
 
     }

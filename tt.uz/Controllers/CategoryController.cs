@@ -4,10 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using tt.uz.Entities;
 using tt.uz.Services;
 
 namespace tt.uz.Controllers
 {
+    [Authorize]
+    [Route("api/[controller]")]
+    [ApiController]
     public class CategoryController : ControllerBase
     {
         private ICategoryService _categoryService;
@@ -21,9 +25,10 @@ namespace tt.uz.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public ActionResult Get()
+        public IActionResult Get()
         {
-            return _categoryService.GetAll;
+            IEnumerable<Category> categories = _categoryService.GetAll();
+            return Ok(categories);
         }
     }
 }
