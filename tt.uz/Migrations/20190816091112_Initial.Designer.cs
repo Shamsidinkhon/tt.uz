@@ -10,8 +10,8 @@ using tt.uz.Helpers;
 namespace tt.uz.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190815075752_tt.uz.Helpers.Data.Context.cs")]
-    partial class ttuzHelpersDataContextcs
+    [Migration("20190816091112_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,7 +33,7 @@ namespace tt.uz.Migrations
 
                     b.Property<string>("Image");
 
-                    b.Property<string>("MetaDescrition");
+                    b.Property<string>("MetaDescription");
 
                     b.Property<string>("MetaKeywords");
 
@@ -41,17 +41,15 @@ namespace tt.uz.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<int>("ParentId");
+                    b.Property<int?>("ParentId");
 
                     b.Property<string>("ShortDescription");
 
                     b.Property<string>("Slug");
 
-                    b.Property<int>("Sort");
+                    b.Property<int?>("Sort");
 
                     b.Property<int>("Status");
-
-                    b.Property<string>("Username");
 
                     b.HasKey("Id");
 

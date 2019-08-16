@@ -104,6 +104,9 @@ namespace tt.uz
             }
 
             app.UseHttpsRedirection();
+            app.UseCors(
+                options => options.AllowAnyOrigin().AllowAnyMethod()
+            );
             app.UseMvc();
         }
     }

@@ -15,7 +15,6 @@ namespace tt.uz.Entities
         public int Id { get; set; }
         public int? ParentId { get; set; }
         public string Slug { get; set; }
-        public string Username { get; set; }
         public string Name { get; set; }
         public string Image { get; set; }
         public string ShortDescription { get; set; }

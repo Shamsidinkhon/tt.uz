@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace tt.uz.Migrations
 {
-    public partial class ttuzHelpersDataContextcs : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,17 +14,16 @@ namespace tt.uz.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    ParentId = table.Column<int>(nullable: false),
+                    ParentId = table.Column<int>(nullable: true),
                     Slug = table.Column<string>(nullable: true),
-                    Username = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     Image = table.Column<string>(nullable: true),
                     ShortDescription = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     MetaTitle = table.Column<string>(nullable: true),
-                    MetaDescrition = table.Column<string>(nullable: true),
+                    MetaDescription = table.Column<string>(nullable: true),
                     MetaKeywords = table.Column<string>(nullable: true),
-                    Sort = table.Column<int>(nullable: false),
+                    Sort = table.Column<int>(nullable: true),
                     Status = table.Column<int>(nullable: false),
                     Icon = table.Column<string>(nullable: true)
                 },

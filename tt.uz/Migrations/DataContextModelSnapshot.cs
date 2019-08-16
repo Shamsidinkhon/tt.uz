@@ -49,8 +49,6 @@ namespace tt.uz.Migrations
 
                     b.Property<int>("Status");
 
-                    b.Property<string>("Username");
-
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
