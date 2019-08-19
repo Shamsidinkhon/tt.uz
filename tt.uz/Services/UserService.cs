@@ -9,11 +9,12 @@ namespace tt.uz.Services
 {
     public interface IUserService
     {
-        User Authenticate(string username, string password);
+        User AuthenticateWithEmail(string email, string password);
+        User AuthenticateWithPhone(string phone, string password);
         IEnumerable<User> GetAll();
         User GetById(int id);
-        User Create(User user, string password);
-        void Update(User user, string password = null);
+        User Create(User user, string password, bool isEmail);
+        //void Update(User user, string password = null);
         void Delete(int id);
     }
 
@@ -26,12 +27,29 @@ namespace tt.uz.Services
             _context = context;
         }
 
-        public User Authenticate(string username, string password)
+        public User AuthenticateWithEmail(string email, string password)
         {
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+                return null;
+            var user = _context.Users.SingleOrDefault(x => x.Email == email);
+
+            // check if username exists
+            if (user == null)
                 return null;
 
-            var user = _context.Users.SingleOrDefault(x => x.Username == username);
+            // check if password is correct
+            if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
+                return null;
+
+            // authentication successful
+            return user;
+        }
+
+        public User AuthenticateWithPhone(string phone, string password)
+        {
+            if (string.IsNullOrEmpty(phone) || string.IsNullOrEmpty(password))
+                return null;
+            var user = _context.Users.SingleOrDefault(x => x.Phone == phone);
 
             // check if username exists
             if (user == null)
@@ -55,14 +73,22 @@ namespace tt.uz.Services
             return _context.Users.Find(id);
         }
 
-        public User Create(User user, string password)
+        public User Create(User user, string password, bool isEmail)
         {
             // validation
             if (string.IsNullOrWhiteSpace(password))
                 throw new AppException("Password is required");
 
-            if (_context.Users.Any(x => x.Username == user.Username))
-                throw new AppException("Username \"" + user.Username + "\" is already taken");
+            if (isEmail)
+            {
+                if (_context.Users.Any(x => x.Email == user.Email))
+                    throw new AppException("Email \"" + user.Email + "\" is already taken");
+            }
+            else
+            {
+                if (_context.Users.Any(x => x.Phone == user.Phone))
+                    throw new AppException("Phone \"" + user.Phone + "\" is already taken");
+            }
 
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(password, out passwordHash, out passwordSalt);
@@ -76,38 +102,38 @@ namespace tt.uz.Services
             return user;
         }
 
-        public void Update(User userParam, string password = null)
-        {
-            var user = _context.Users.Find(userParam.Id);
+        //public void Update(User userParam, string password = null)
+        //{
+        //    var user = _context.Users.Find(userParam.Id);
 
-            if (user == null)
-                throw new AppException("User not found");
+        //    if (user == null)
+        //        throw new AppException("User not found");
 
-            if (userParam.Username != user.Username)
-            {
-                // username has changed so check if the new username is already taken
-                if (_context.Users.Any(x => x.Username == userParam.Username))
-                    throw new AppException("Username " + userParam.Username + " is already taken");
-            }
+        //    if (userParam.Username != user.Username)
+        //    {
+        //        // username has changed so check if the new username is already taken
+        //        if (_context.Users.Any(x => x.Username == userParam.Username))
+        //            throw new AppException("Username " + userParam.Username + " is already taken");
+        //    }
 
-            // update user properties
-            user.FirstName = userParam.FirstName;
-            user.LastName = userParam.LastName;
-            user.Username = userParam.Username;
+        //    // update user properties
+        //    user.FirstName = userParam.FirstName;
+        //    user.Phone = userParam.Phone;
+        //    user.Username = userParam.Username;
 
-            // update password if it was entered
-            if (!string.IsNullOrWhiteSpace(password))
-            {
-                byte[] passwordHash, passwordSalt;
-                CreatePasswordHash(password, out passwordHash, out passwordSalt);
+        //    // update password if it was entered
+        //    if (!string.IsNullOrWhiteSpace(password))
+        //    {
+        //        byte[] passwordHash, passwordSalt;
+        //        CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
-                user.PasswordHash = passwordHash;
-                user.PasswordSalt = passwordSalt;
-            }
+        //        user.PasswordHash = passwordHash;
+        //        user.PasswordSalt = passwordSalt;
+        //    }
 
-            _context.Users.Update(user);
-            _context.SaveChanges();
-        }
+        //    _context.Users.Update(user);
+        //    _context.SaveChanges();
+        //}
 
         public void Delete(int id)
         {
@@ -151,5 +177,5 @@ namespace tt.uz.Services
 
             return true;
         }
-}
+    }
 }

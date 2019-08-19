@@ -41,7 +41,7 @@ namespace tt.uz.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]UserDto userDto)
         {
-            var user = _userService.Authenticate(userDto.Username, userDto.Password);
+            var user = userDto.IsEmail ? _userService.AuthenticateWithEmail(userDto.Email, userDto.Password) : _userService.AuthenticateWithPhone(userDto.Phone, userDto.Password);
 
             if (user == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
@@ -64,9 +64,8 @@ namespace tt.uz.Controllers
             return Ok(new
             {
                 Id = user.Id,
-                Username = user.Username,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
+                Email = user.Email,
+                Phone = user.Phone,
                 Token = tokenString
             });
         }
@@ -81,7 +80,7 @@ namespace tt.uz.Controllers
             try
             {
                 // save 
-                _userService.Create(user, userDto.Password);
+                _userService.Create(user, userDto.Password, userDto.IsEmail);
                 return Ok("Saved");
             }
             catch (AppException ex)
