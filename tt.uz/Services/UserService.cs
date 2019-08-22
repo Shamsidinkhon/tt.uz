@@ -21,10 +21,12 @@ namespace tt.uz.Services
     public class UserService : IUserService
     {
         private DataContext _context;
+        private IVerificationCodeService _vcodeService;
 
-        public UserService(DataContext context)
+        public UserService(DataContext context, IVerificationCodeService vcodeService)
         {
             _context = context;
+            _vcodeService = vcodeService;
         }
 
         public User AuthenticateWithEmail(string email, string password)
@@ -97,6 +99,19 @@ namespace tt.uz.Services
             user.PasswordSalt = passwordSalt;
 
             _context.Users.Add(user);
+
+            VerificationCode vcode = new VerificationCode
+            {
+                FieldType = isEmail ? VerificationCode.EMAIL : VerificationCode.PHONE,
+                FieldValue = isEmail ? user.Email : user.Phone
+            };
+            if (vcode.FieldType == VerificationCode.EMAIL)
+                vcode.ExpireDate = DateHelper.AddDay(1);
+            else if (vcode.FieldType == VerificationCode.PHONE)
+                vcode.ExpireDate = DateHelper.AddMinut(10);
+            if (_vcodeService.Send(vcode))
+                _context.VerificationCodes.Add(vcode);
+
             _context.SaveChanges();
 
             return user;

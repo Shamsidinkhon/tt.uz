@@ -44,6 +44,7 @@ namespace tt.uz
                     errorNumbersToAdd: null);
                 });
             });
+            services.AddMemoryCache();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddAutoMapper();
 
@@ -88,6 +89,8 @@ namespace tt.uz
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICategoryService, CategoryService>();
+            services.AddScoped<IVerificationCodeService, VerificationCodeService>();
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

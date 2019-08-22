@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using tt.uz.Helpers;
 
 namespace tt.uz.Controllers
 {
@@ -14,7 +15,7 @@ namespace tt.uz.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<string>> Get()
         {
-            return new string[] { "value1", "value2", "Deployment test " };
+            return new string[] { "value1", "value2", DateHelper.AddMinut(10).ToString()};
         }
 
         // GET api/values/5

@@ -25,16 +25,19 @@ namespace tt.uz.Controllers
     {
         private IUserService _userService;
         private IMapper _mapper;
+        private IVerificationCodeService _vcodeService;
         private readonly AppSettings _appSettings;
 
         public UsersController(
             IUserService userService,
             IMapper mapper,
-            IOptions<AppSettings> appSettings)
+            IOptions<AppSettings> appSettings, 
+            IVerificationCodeService vcodeService)
         {
             _userService = userService;
             _mapper = mapper;
             _appSettings = appSettings.Value;
+            _vcodeService = vcodeService;
         }
 
         [AllowAnonymous]
@@ -63,10 +66,14 @@ namespace tt.uz.Controllers
             // return basic user info (without password) and token to store client side
             return Ok(new
             {
-                Id = user.Id,
-                Email = user.Email,
-                Phone = user.Phone,
-                Token = tokenString
+                status = true,
+                userData = new
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    Phone = user.Phone,
+                    Token = tokenString
+                }
             });
         }
 
@@ -81,13 +88,32 @@ namespace tt.uz.Controllers
             {
                 // save 
                 _userService.Create(user, userDto.Password, userDto.IsEmail);
-                return Ok("Saved");
+                return Ok(new { status = true, message = "User Data Saved" });
             }
             catch (AppException ex)
             {
                 // return error message if there was an exception
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { status = false, message = ex.Message });
             }
         }
+
+        [HttpPost("validate")]
+        public IActionResult Validate([FromBody]VCodeDto vCode)
+        {
+            try
+            {
+                return Ok(new { status = _vcodeService.Verify(
+                    vCode.IsEmail ? vCode.Email : vCode.Phone, 
+                    vCode.IsEmail ? VerificationCode.EMAIL : VerificationCode.PHONE, 
+                    vCode.Code
+                    ), message = "Verification completed" });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { status = false, message = ex.Message });
+            }
+        }
+
     }
 }
