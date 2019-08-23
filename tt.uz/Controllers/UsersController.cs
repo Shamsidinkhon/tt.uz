@@ -97,6 +97,7 @@ namespace tt.uz.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("validate")]
         public IActionResult Validate([FromBody]VCodeDto vCode)
         {

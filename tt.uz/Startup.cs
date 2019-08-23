@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -85,6 +86,11 @@ namespace tt.uz
                     ValidateIssuer = false,
                     ValidateAudience = false
                 };
+            }).AddCookie().AddFacebook(facebookOptions =>
+            {
+                facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
+                facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                facebookOptions.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             });
 
             services.AddScoped<IUserService, UserService>();
@@ -108,8 +114,9 @@ namespace tt.uz
 
             app.UseHttpsRedirection();
             app.UseCors(
-                options => options.AllowAnyOrigin().AllowAnyMethod()
+                options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials().Build()
             );
+            app.UseAuthentication();
             app.UseMvc();
         }
     }
