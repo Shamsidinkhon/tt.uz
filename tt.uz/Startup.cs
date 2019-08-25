@@ -59,6 +59,14 @@ namespace tt.uz
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            }).AddCookie(options => {
+                options.LoginPath = "/api/users/signin";
+            }).AddFacebook(facebookOptions =>
+            {
+                facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
+                facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
+                //facebookOptions.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(x =>
             {
@@ -86,11 +94,6 @@ namespace tt.uz
                     ValidateIssuer = false,
                     ValidateAudience = false
                 };
-            }).AddCookie().AddFacebook(facebookOptions =>
-            {
-                facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
-                facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
-                facebookOptions.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             });
 
             services.AddScoped<IUserService, UserService>();

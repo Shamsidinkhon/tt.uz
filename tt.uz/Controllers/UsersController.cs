@@ -122,30 +122,10 @@ namespace tt.uz.Controllers
                 return BadRequest(new { status = false, message = ex.Message });
             }
         }
-
         [AllowAnonymous]
-        [HttpPost(nameof(ExternalLogin))]
-        public IActionResult ExternalLogin(ExternalLoginModel model)
-        {
-            if (model == null || !ModelState.IsValid)
-            {
-                return null;
-            }
-
-            var properties = new AuthenticationProperties { RedirectUri = "https://localhost:44322" };
-
-            return Challenge(properties, model.ProviderDisplayName);
-        }
-
-        [AllowAnonymous]
-        [HttpGet(nameof(ExternalLoginCallback))]
-        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
-        {
-            //Here we can retrieve the claims
-            var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
-            return null;
-        }
+        [HttpGet("signin/{provider}")]
+        public IActionResult SignIn(string provider, string returnUrl = null) =>
+        Challenge(new AuthenticationProperties { RedirectUri = returnUrl ?? "/" }, provider);
 
     }
 }
