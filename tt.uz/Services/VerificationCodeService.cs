@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using AutoMapper;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using System;
@@ -16,7 +17,7 @@ namespace tt.uz.Services
 {
     public interface IVerificationCodeService
     {
-        bool Verify(string value, string type, int code);
+        bool Verify(string value, string type, int code, bool isEmail);
         bool Send(VerificationCode vcode);
     }
     public class VerificationCodeService : IVerificationCodeService
@@ -25,14 +26,16 @@ namespace tt.uz.Services
         private readonly IHttpClientFactory _clientFactory;
         private readonly AppSettings _appSettings;
         private IMemoryCache _cache;
-        public VerificationCodeService(DataContext context, IHttpClientFactory clientFactory, IOptions<AppSettings> appSettings, IMemoryCache memoryCache)
+        private IMapper _mapper;
+        public VerificationCodeService(DataContext context, IHttpClientFactory clientFactory, IOptions<AppSettings> appSettings, IMemoryCache memoryCache, IMapper mapper)
         {
             _context = context;
             _clientFactory = clientFactory;
             _appSettings = appSettings.Value;
             _cache = memoryCache;
+            _mapper = mapper;
         }
-        public bool Verify(string value, string type, int code)
+        public bool Verify(string value, string type, int code, bool isEmail)
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new AppException("Email or Phone is required");
@@ -41,6 +44,10 @@ namespace tt.uz.Services
             var vcode = _context.VerificationCodes.FirstOrDefault(p => p.FieldType == type && p.FieldValue == value && p.Code == code && DateTime.Compare(p.ExpireDate, DateHelper.GetDate()) >= 0);
             if (vcode == null)
                 return false;
+            var tempUser = isEmail ? _context.TempUsers.OrderByDescending(x => x.Id).Any(x => x.Email == value) : _context.TempUsers.OrderByDescending(x => x.Id).Any(x => x.Phone == value);
+            var user = _mapper.Map<User>(tempUser);
+            _context.Users.Add(user);
+            _context.SaveChanges();
             return true;
         }
 

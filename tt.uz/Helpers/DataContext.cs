@@ -13,5 +13,6 @@ namespace tt.uz.Helpers
         public DbSet<User> Users { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<VerificationCode> VerificationCodes { get; set; }
+        public DbSet<TempUser> TempUsers { get; set; }
     }
 }

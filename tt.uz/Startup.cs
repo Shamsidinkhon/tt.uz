@@ -59,14 +59,15 @@ namespace tt.uz
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            }).AddCookie(options => {
-                options.LoginPath = "/api/users/signin";
+            }).AddCookie("signin-facebook", options =>
+            {
+                options.Cookie.Name = "signin-facebook";
+                options.LoginPath = "/signin-facebook";
             }).AddFacebook(facebookOptions =>
             {
                 facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
                 facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
-                //facebookOptions.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                facebookOptions.SignInScheme = "signin-facebook";
             })
             .AddJwtBearer(x =>
             {

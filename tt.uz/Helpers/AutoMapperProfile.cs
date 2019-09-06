@@ -10,6 +10,10 @@ namespace tt.uz.Helpers
         {
             CreateMap<User, UserDto>();
             CreateMap<UserDto, User>();
+            CreateMap<TempUser, TempUserDto>();
+            CreateMap<TempUserDto, TempUser>();
+            CreateMap<TempUser, User>();
+            CreateMap<User, TempUser>();
         }
     }
 }
