@@ -100,6 +100,7 @@ namespace tt.uz
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ICategoryService, CategoryService>();
             services.AddScoped<IVerificationCodeService, VerificationCodeService>();
+            services.AddScoped<ITempUserService, TempUserService>();
             services.AddHttpClient();
         }
 

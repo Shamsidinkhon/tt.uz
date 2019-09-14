@@ -57,6 +57,8 @@ namespace tt.uz.Services
             {
                 SmtpClient client = new SmtpClient("mail.tt.uz");
                 client.UseDefaultCredentials = false;
+                client.Port = 993;
+                client.EnableSsl = true;
                 client.Credentials = new NetworkCredential("no_reply@tt.uz", "nkv%tcF.Lp}4");
 
                 MailMessage mailMessage = new MailMessage();
