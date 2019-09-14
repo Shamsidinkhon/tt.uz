@@ -12,8 +12,8 @@ namespace tt.uz.Helpers
             CreateMap<UserDto, User>();
             CreateMap<TempUser, TempUserDto>();
             CreateMap<TempUserDto, TempUser>();
-            CreateMap<TempUser, User>();
-            CreateMap<User, TempUser>();
+            CreateMap<TempUser, User>().ForMember(x => x.Id, opt => opt.Ignore());
+            CreateMap<User, TempUser>().ForMember(x => x.Id, opt => opt.Ignore());
         }
     }
 }

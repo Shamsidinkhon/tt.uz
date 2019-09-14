@@ -44,7 +44,7 @@ namespace tt.uz.Services
             var vcode = _context.VerificationCodes.FirstOrDefault(p => p.FieldType == type && p.FieldValue == value && p.Code == code && DateTime.Compare(p.ExpireDate, DateHelper.GetDate()) >= 0);
             if (vcode == null)
                 return false;
-            var tempUser = isEmail ? _context.TempUsers.OrderByDescending(x => x.Id).Any(x => x.Email == value) : _context.TempUsers.OrderByDescending(x => x.Id).Any(x => x.Phone == value);
+            var tempUser = isEmail ? _context.TempUsers.OrderByDescending(x => x.Id).FirstOrDefault(x => x.Email == value) : _context.TempUsers.OrderByDescending(x => x.Id).FirstOrDefault(x => x.Phone == value);
             var user = _mapper.Map<User>(tempUser);
             _context.Users.Add(user);
             _context.SaveChanges();
@@ -57,7 +57,7 @@ namespace tt.uz.Services
             {
                 SmtpClient client = new SmtpClient("mail.tt.uz");
                 client.UseDefaultCredentials = false;
-                client.Port = 993;
+                client.Port = 587;
                 client.EnableSsl = true;
                 client.Credentials = new NetworkCredential("no_reply@tt.uz", "nkv%tcF.Lp}4");
 
