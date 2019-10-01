@@ -126,29 +126,5 @@ namespace tt.uz.Controllers
                 return BadRequest(new { status = false, message = ex.Message });
             }
         }
-
-        [AllowAnonymous]
-        [HttpPost("signin/{provider}")]
-        public IActionResult ExternalLogin(string provider)
-        {
-            //Issue a challenge to external login middleware to trigger sign in process
-            return Challenge(new AuthenticationProperties { RedirectUri = "/" }, provider);
-        }
-
-        //[AllowAnonymous]
-        //[HttpGet("signin/{provider}")]
-        //public IActionResult SignIn(string provider, string returnUrl = null) =>
-        //Challenge(new AuthenticationProperties { RedirectUri = returnUrl ?? "/" }, provider);
-
-        [AllowAnonymous]
-        [HttpGet(nameof(ExternalLoginCallback))]
-        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
-        {
-            //Here we can retrieve the claims
-            //var result = await HttpContext.AuthenticateAsync("signin-facebook");
-
-            return null;
-        }
-
     }
 }
