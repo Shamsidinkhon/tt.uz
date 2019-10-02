@@ -23,6 +23,6 @@ namespace tt.uz.Dtos
         public ContactDetail ContactDetail { get; set; }
 
         public int Status { get; set; }
-        public IFormFile Images { get; set; }
+        public List<IFormFile> Images { get; set; }
     }
 }

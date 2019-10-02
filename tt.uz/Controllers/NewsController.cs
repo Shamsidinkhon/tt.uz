@@ -35,7 +35,7 @@ namespace tt.uz.Controllers
 
         }
         [HttpPost("add")]
-        public IActionResult Add([FromBody]NewsDTO newsDTO)
+        public IActionResult Add([FromForm]NewsDTO newsDTO)
         {
             // map dto to entity
             var news = _mapper.Map<News>(newsDTO);
@@ -43,28 +43,7 @@ namespace tt.uz.Controllers
             try
             {
                 // save 
-                _newsService.Create(news);
-
-                var files = Request.Form.Files;
-                var folderName = Path.Combine("StaticFiles", "Images");
-                var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-
-                if (files.Any(f => f.Length == 0))
-                {
-                    return BadRequest();
-                }
-
-                foreach (var file in files)
-                {
-                    var fileName = ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"');
-                    var fullPath = Path.Combine(pathToSave, fileName);
-                    var dbPath = Path.Combine(folderName, fileName); //you can add this path to a list and then return all dbPaths to the client if require
-
-                    using (var stream = new FileStream(fullPath, FileMode.Create))
-                    {
-                        file.CopyTo(stream);
-                    }
-                }
+                _newsService.Create(news, newsDTO.Images);
 
                 return Ok(new { status = true });
             }
