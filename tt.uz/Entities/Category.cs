@@ -26,6 +26,8 @@ namespace tt.uz.Entities
         [DefaultValue(1)]
         public int Status { get; set; }
         public string Icon { get; set; }
+        [NotMapped]
+        public IEnumerable<Category> Children { get; set; }
 
     }
 }

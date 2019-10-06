@@ -24,10 +24,18 @@ namespace tt.uz.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
+        [HttpGet("get-all")]
         public IActionResult Get()
         {
             IEnumerable<Category> categories = _categoryService.GetAll();
+            return Ok(categories);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("get-with-children")]
+        public IActionResult GetWithChildren()
+        {
+            IEnumerable<Category> categories = _categoryService.GetWithChildren();
             return Ok(categories);
         }
     }
