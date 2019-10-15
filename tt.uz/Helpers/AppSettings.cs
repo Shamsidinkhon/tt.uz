@@ -12,6 +12,8 @@ namespace tt.uz.Helpers
         public string SmsEmail { get; set; }
         public string SmsPassword { get; set; }
         public string SmsPostUrl { get; set; }
+        public string FacebookAppId { get; set; }
+        public string FacebookAppSecret { get; set; }
 
     }
 }
