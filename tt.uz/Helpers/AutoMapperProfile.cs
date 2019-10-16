@@ -15,6 +15,7 @@ namespace tt.uz.Helpers
             CreateMap<TempUser, User>().ForMember(x => x.Id, opt => opt.Ignore());
             CreateMap<User, TempUser>().ForMember(x => x.Id, opt => opt.Ignore());
             CreateMap<NewsDTO, News>();
+            CreateMap<ExternalLoginDTO, ExternalLogin>().ForMember(x => x.Id, opt => opt.Ignore()).ForMember(x => x.ClientId, opt => opt.MapFrom(src => src.Id));
         }
     }
 }

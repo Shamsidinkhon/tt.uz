@@ -11,11 +11,13 @@ namespace tt.uz.Services
     {
         User AuthenticateWithEmail(string email, string password);
         User AuthenticateWithPhone(string phone, string password);
+        User FindByEmail(string email);
         IEnumerable<User> GetAll();
         User GetById(int id);
         User Create(User user, string password, bool isEmail);
         //void Update(User user, string password = null);
         void Delete(int id);
+        User CreateExternalUser(User user);
     }
 
     public class UserService : IUserService
@@ -27,6 +29,13 @@ namespace tt.uz.Services
         {
             _context = context;
             _vcodeService = vcodeService;
+        }
+
+        public User FindByEmail(string email) {
+            var user = _context.Users.SingleOrDefault(x => x.Email == email);
+            if (user == null)
+                return null;
+            return user;
         }
 
         public User AuthenticateWithEmail(string email, string password)
@@ -111,6 +120,16 @@ namespace tt.uz.Services
                 vcode.ExpireDate = DateHelper.AddMinut(10);
             if (_vcodeService.Send(vcode))
                 _context.VerificationCodes.Add(vcode);
+
+            _context.SaveChanges();
+
+            return user;
+        }
+
+        public User CreateExternalUser(User user)
+        {
+           
+            _context.Users.Add(user);
 
             _context.SaveChanges();
 

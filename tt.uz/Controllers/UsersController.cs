@@ -29,6 +29,7 @@ namespace tt.uz.Controllers
     public class UsersController : ControllerBase
     {
         private IUserService _userService;
+        private IExternalLoginService _externalLoginService;
         private ITempUserService _userTempService;
         private IMapper _mapper;
         private IVerificationCodeService _vcodeService;
@@ -42,7 +43,8 @@ namespace tt.uz.Controllers
             IMapper mapper,
             IOptions<AppSettings> appSettings,
             IVerificationCodeService vcodeService,
-            IHttpClientFactory clientFactory)
+            IHttpClientFactory clientFactory,
+            IExternalLoginService externalLoginService)
         {
             _userService = userService;
             _userTempService = userTempService;
@@ -50,6 +52,7 @@ namespace tt.uz.Controllers
             _appSettings = appSettings.Value;
             _vcodeService = vcodeService;
             _clientFactory = clientFactory;
+            _externalLoginService = externalLoginService;
         }
 
         [AllowAnonymous]
@@ -145,52 +148,68 @@ namespace tt.uz.Controllers
             // 2. validate the user access token
             var userAccessTokenValidationResponse = client.GetAsync($"https://graph.facebook.com/debug_token?input_token={model.AccessToken}&access_token={appAccessToken.AccessToken}");
             var userAccessResponseString = userAccessTokenValidationResponse.Result.Content.ReadAsStringAsync().Result;
-            var userAccessTokenValidation = JsonConvert.DeserializeObject(userAccessResponseString);
+            var userAccessTokenValidation = JsonConvert.DeserializeObject<FacebookUserAccessTokenValidation>(userAccessResponseString);
 
-            //if (!userAccessTokenValidation.Data.IsValid)
-            //{
-            //    return BadRequest(Errors.AddErrorToModelState("login_failure", "Invalid facebook token.", ModelState));
-            //}
+            if (!userAccessTokenValidation.Data.IsValid)
+            {
+                return BadRequest(new { status = false, message = "Invalid facebook token." });
+            }
 
-            //// 3. we've got a valid token so we can request user data from fb
-            //var userInfoResponse = await Client.GetStringAsync($"https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,name,gender,locale,birthday,picture&access_token={model.AccessToken}");
-            //var userInfo = JsonConvert.DeserializeObject<FacebookUserData>(userInfoResponse);
+            // 3. we've got a valid token so we can request user data from fb
+            var userInfoResponse = client.GetAsync($"https://graph.facebook.com/v2.8/me?fields=id,email,first_name,last_name,name,gender,locale,birthday,picture&access_token={model.AccessToken}");
+            var userInfoResponseString = userInfoResponse.Result.Content.ReadAsStringAsync().Result;
+            var userInfo = JsonConvert.DeserializeObject<ExternalLoginDTO>(userInfoResponseString);
 
-            //// 4. ready to create the local user account (if necessary) and jwt
-            //var user = await _userManager.FindByEmailAsync(userInfo.Email);
+            // 4. ready to create the local user account (if necessary) and jwt
+            var user = _userService.FindByEmail(userInfo.Email);
 
-            //if (user == null)
-            //{
-            //    var appUser = new AppUser
-            //    {
-            //        FirstName = userInfo.FirstName,
-            //        LastName = userInfo.LastName,
-            //        FacebookId = userInfo.Id,
-            //        Email = userInfo.Email,
-            //        UserName = userInfo.Email,
-            //        PictureUrl = userInfo.Picture.Data.Url
-            //    };
+            if (user == null)
+            {
+                var appUser = new User
+                {
+                    Email = userInfo.Email,
+                };
+                _userService.CreateExternalUser(appUser);
+            }
 
-            //    var result = await _userManager.CreateAsync(appUser, Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 8));
+            // generate the jwt for the local user...
+            var localUser = _userService.FindByEmail(userInfo.Email);
 
-            //    if (!result.Succeeded) return new BadRequestObjectResult(Errors.AddErrorsToModelState(result, ModelState));
+            if (localUser == null)
+            {
+                return BadRequest(new { status = false, message = "Failed to create local user account." });
+            }
 
-            //    await _appDbContext.Customers.AddAsync(new Customer { IdentityId = appUser.Id, Location = "", Locale = userInfo.Locale, Gender = userInfo.Gender });
-            //    await _appDbContext.SaveChangesAsync();
-            //}
+            _externalLoginService.CreateOrUpdate(localUser, userInfo, ExternalLogin.FACEBOOK);
 
-            //// generate the jwt for the local user...
-            //var localUser = await _userManager.FindByNameAsync(userInfo.Email);
 
-            //if (localUser == null)
-            //{
-            //    return BadRequest(Errors.AddErrorToModelState("login_failure", "Failed to create local user account.", ModelState));
-            //}
 
-            //var jwt = await Tokens.GenerateJwt(_jwtFactory.GenerateClaimsIdentity(localUser.UserName, localUser.Id), _jwtFactory, localUser.UserName, _jwtOptions, new JsonSerializerSettings { Formatting = Formatting.Indented });
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, localUser.Id.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
 
-            //return new OkObjectResult(jwt);
-            return Ok();
+            // return basic user info (without password) and token to store client side
+            return Ok(new
+            {
+                status = true,
+                userData = new
+                {
+                    Id = localUser.Id,
+                    Email = localUser.Email,
+                    Phone = localUser.Phone,
+                    Token = tokenString
+                }
+            });
         }
     }
 }
