@@ -53,5 +53,21 @@ namespace tt.uz.Controllers
                 return Ok(new { status = false, message = ex.Message });
             }
         }
+
+        [AllowAnonymous]
+        [HttpPost("get-all")]
+        public IEnumerable<NewsReponse> GetAll([FromForm]NewsSearch newsSearch)
+        {
+            newsSearch.Status = News.ACTIVE;
+            return _newsService.GetAllByFilter(newsSearch);
+        }
+
+        [HttpPost("get-all-by-user")]
+        public IEnumerable<NewsReponse> GetAllByUser([FromForm]NewsSearch newsSearch)
+        {
+            newsSearch.Status = News.ACTIVE;
+            newsSearch.OwnerId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+            return _newsService.GetAllByFilter(newsSearch);
+        }
     }
 }

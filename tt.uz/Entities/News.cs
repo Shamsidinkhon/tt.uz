@@ -10,9 +10,14 @@ namespace tt.uz.Entities
 {
     public class News
     {
+        public const int NEW = 1;
+        public const int ACTIVE = 2;
+        public const int REJECTED = 3;
+        public const int ARCHIVE = 4;
         public News() {
             CreatedDate = DateHelper.GetDate();
             UpdatedDate = DateHelper.GetDate();
+            Status = NEW;
         }
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

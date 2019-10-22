@@ -7,11 +7,13 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using tt.uz.Entities;
 using tt.uz.Helpers;
+using Microsoft.EntityFrameworkCore;
 
 namespace tt.uz.Services
 {
     public interface INewsService{
         News Create(News news, List<IFormFile> images);
+        IEnumerable<NewsReponse> GetAllByFilter(NewsSearch newsSearch);
     }
     public class NewsService : INewsService
     {
@@ -57,6 +59,43 @@ namespace tt.uz.Services
             _context.SaveChanges();
 
             return news;
+        }
+
+        public IEnumerable<NewsReponse> GetAllByFilter(NewsSearch newsSearch)
+        {
+            var news = _context.News
+                .Include(x => x.Category)
+                .Include(x => x.Price)
+                .Include(x => x.Location)
+                .Include(x => x.ContactDetail);
+
+            if (newsSearch.OwnerId > 0) {
+                news.Where(x => x.OwnerId == newsSearch.OwnerId);
+            }
+
+            int[] statuses = { News.NEW, News.ACTIVE, News.ARCHIVE, News.REJECTED };
+
+            if (statuses.Contains(newsSearch.Status))
+            {
+                news.Where(x => x.Status == newsSearch.Status);
+            }
+
+            if (newsSearch.Id > 0)
+            {
+                news.Where(x => x.Id == newsSearch.Id);
+            }
+
+            if (newsSearch.CategoryId > 0)
+            {
+                news.Where(x => x.CategoryId == newsSearch.CategoryId);
+            }
+
+            if (!String.IsNullOrEmpty(newsSearch.Title))
+            {
+                news.Where(x => x.Title == newsSearch.Title);
+            }
+
+            return news.AsQueryable().Cast<NewsReponse>();
         }
     }
 }
