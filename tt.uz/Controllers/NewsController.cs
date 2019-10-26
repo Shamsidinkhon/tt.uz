@@ -56,16 +56,20 @@ namespace tt.uz.Controllers
 
         [AllowAnonymous]
         [HttpPost("get-all")]
-        public IEnumerable<NewsReponse> GetAll([FromForm]NewsSearch newsSearch)
+        public IQueryable<News> GetAll([FromBody]NewsSearch newsSearch)
         {
-            newsSearch.Status = News.ACTIVE;
+            int[] statuses = { News.ACTIVE };
+
+            if (!statuses.Contains(newsSearch.Status))
+            {
+                newsSearch.Status = News.ACTIVE;
+            }
             return _newsService.GetAllByFilter(newsSearch);
         }
 
         [HttpPost("get-all-by-user")]
-        public IEnumerable<NewsReponse> GetAllByUser([FromForm]NewsSearch newsSearch)
+        public IQueryable<News> GetAllByUser([FromBody]NewsSearch newsSearch)
         {
-            newsSearch.Status = News.ACTIVE;
             newsSearch.OwnerId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
             return _newsService.GetAllByFilter(newsSearch);
         }

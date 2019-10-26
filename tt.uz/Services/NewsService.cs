@@ -13,7 +13,7 @@ namespace tt.uz.Services
 {
     public interface INewsService{
         News Create(News news, List<IFormFile> images);
-        IEnumerable<NewsReponse> GetAllByFilter(NewsSearch newsSearch);
+        IQueryable<News> GetAllByFilter(NewsSearch newsSearch);
     }
     public class NewsService : INewsService
     {
@@ -61,41 +61,44 @@ namespace tt.uz.Services
             return news;
         }
 
-        public IEnumerable<NewsReponse> GetAllByFilter(NewsSearch newsSearch)
+        public IQueryable<News> GetAllByFilter(NewsSearch newsSearch)
         {
-            var news = _context.News
+         
+            IQueryable<News> news = from n in _context.News select n;
+
+            news = news
                 .Include(x => x.Category)
                 .Include(x => x.Price)
                 .Include(x => x.Location)
                 .Include(x => x.ContactDetail);
 
             if (newsSearch.OwnerId > 0) {
-                news.Where(x => x.OwnerId == newsSearch.OwnerId);
+                news = news.Where(x => x.OwnerId == newsSearch.OwnerId);
             }
 
             int[] statuses = { News.NEW, News.ACTIVE, News.ARCHIVE, News.REJECTED };
 
             if (statuses.Contains(newsSearch.Status))
             {
-                news.Where(x => x.Status == newsSearch.Status);
+                news = news.Where(x => x.Status == newsSearch.Status);
             }
 
             if (newsSearch.Id > 0)
             {
-                news.Where(x => x.Id == newsSearch.Id);
+                news = news.Where(x => x.Id == newsSearch.Id);
             }
 
             if (newsSearch.CategoryId > 0)
             {
-                news.Where(x => x.CategoryId == newsSearch.CategoryId);
+                news = news.Where(x => x.CategoryId == newsSearch.CategoryId);
             }
 
             if (!String.IsNullOrEmpty(newsSearch.Title))
             {
-                news.Where(x => x.Title == newsSearch.Title);
+                news = news.Where(x => x.Title.Contains(newsSearch.Title));
             }
 
-            return news.AsQueryable().Cast<NewsReponse>();
+            return news;
         }
     }
 }
