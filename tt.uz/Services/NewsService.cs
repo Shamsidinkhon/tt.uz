@@ -14,6 +14,7 @@ namespace tt.uz.Services
     public interface INewsService{
         News Create(News news, List<IFormFile> images);
         IQueryable<News> GetAllByFilter(NewsSearch newsSearch);
+        bool PostFavourite(UserFavourites uf);
     }
     public class NewsService : INewsService
     {
@@ -99,6 +100,12 @@ namespace tt.uz.Services
             }
 
             return news;
+        }
+
+        public bool PostFavourite(UserFavourites uf) {
+            _context.UserFavourites.Add(uf);
+            _context.SaveChanges();
+            return true;
         }
     }
 }

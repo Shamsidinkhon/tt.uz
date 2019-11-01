@@ -73,5 +73,22 @@ namespace tt.uz.Controllers
             newsSearch.OwnerId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
             return _newsService.GetAllByFilter(newsSearch);
         }
+
+        [HttpPost("post-favourite")]
+        public IActionResult PostFavourite(int newsId)
+        {
+            try
+            {
+                UserFavourites uf = new UserFavourites();
+                uf.NewsId = newsId;
+                uf.UserId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+                return Ok(new { status = _newsService.PostFavourite(uf) });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+        }
     }
 }

@@ -20,5 +20,6 @@ namespace tt.uz.Helpers
         public DbSet<Image> Images { get; set; }
         public DbSet<ContactDetail> ContactDetails { get; set; }
         public DbSet<ExternalLogin> ExternalLogin { get; set; }
+        public DbSet<UserFavourites> UserFavourites { get; set; }
     }
 }
