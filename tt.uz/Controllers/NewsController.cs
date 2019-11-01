@@ -43,9 +43,24 @@ namespace tt.uz.Controllers
             try
             {
                 // save 
-                _newsService.Create(news, newsDTO.Images);
+                _newsService.Create(news, newsDTO.ImageIds);
 
                 return Ok(new { status = true });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost("upload-image")]
+        public IActionResult UploadImage(IFormFile image)
+        {
+            // map dto to entity
+            try
+            {
+                return Ok(new { status = true, imageId = _newsService.UploadImage(image, Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name)) });
             }
             catch (AppException ex)
             {
