@@ -29,14 +29,14 @@ namespace tt.uz.Services
 
         public IEnumerable<CategoryDTO> GetAll()
         {
-            var cats = JsonConvert.DeserializeObject<IEnumerable<Category>>(System.IO.File.ReadAllText(@"categories.json"));
+            var cats = JsonConvert.DeserializeObject<IEnumerable<CategoryDTO>>(System.IO.File.ReadAllText(@"categories.json"));
             return _mapper.Map<IEnumerable<CategoryDTO>>(cats);
             //return _context.Categories;
         }
 
         public IEnumerable<CategoryDTO> GetWithChildren()
         {
-            var cats = JsonConvert.DeserializeObject<IEnumerable<Category>>(System.IO.File.ReadAllText(@"categoriesWithChildren.json"));
+            var cats = JsonConvert.DeserializeObject<IEnumerable<CategoryDTO>>(System.IO.File.ReadAllText(@"categoriesWithChildren.json"));
             return _mapper.Map<IEnumerable<CategoryDTO>>(cats);
             //var cats =  _context.Categories.Where(x => x.ParentId == null || x.ParentId.ToString() == "");
             //foreach (Category cat in cats) {
