@@ -20,8 +20,8 @@ namespace tt.uz.Entities
         public string Path { get; set; }
 
         public int NewsId { get; set; }
-        [ForeignKey("NewsId")]
-        public News News { get; set; }
+        public int UserId { get; set; }
+
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
     }

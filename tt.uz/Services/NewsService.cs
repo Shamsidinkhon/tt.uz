@@ -12,8 +12,9 @@ using Microsoft.EntityFrameworkCore;
 namespace tt.uz.Services
 {
     public interface INewsService{
-        News Create(News news, List<IFormFile> images);
+        News Create(News news, string imageIds);
         IEnumerable<NewsReponse> GetAllByFilter(NewsSearch newsSearch);
+        int UploadImage(IFormFile file, int userId);
     }
     public class NewsService : INewsService
     {
@@ -21,44 +22,52 @@ namespace tt.uz.Services
         public NewsService(DataContext context) {
             _context = context;
         }
-        public News Create(News news, List<IFormFile> files)
+        public News Create(News news, string imageIds)
         {
-
             _context.News.Add(news);
-
             _context.SaveChanges();
+            var ids = imageIds.Split(',').Select(Int32.Parse).ToList();
+            foreach(int id in ids) {
+                var image = _context.Images.SingleOrDefault(x => x.ImageId == id);
+                if (image != null) {
+                    image.NewsId = news.Id;
+                    _context.Images.Update(image);
+                }
+            }
+            _context.SaveChanges();
+            return news;
+        }
 
+        public int UploadImage(IFormFile file, int userId) {
             var folderName = Path.Combine("Resources", "Images");
             var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), folderName);
-            string[] extArray = { ".png", ".jpeg", ".jpg"};
-            if (files.Any(f => f.Length == 0) || files.Any(f => Array.IndexOf(extArray, Path.GetExtension(ContentDispositionHeaderValue.Parse(f.ContentDisposition).FileName.Trim('"'))) == -1))
+            string[] extArray = { ".png", ".jpeg", ".jpg" };
+
+            if (file == null)
             {
-                _context.Remove(news);
-                _context.Remove(news.ContactDetail);
-                _context.Remove(news.Location);
-                _context.Remove(news.Price);
-                _context.SaveChanges();
+                throw new AppException("File is required");
+            }
+
+            if (file.Length == 0 || Array.IndexOf(extArray, Path.GetExtension(ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"'))) == -1)
+            {
                 throw new AppException("File size should be more than 0!; PNG, JPEG, JPG extensions are allowed");
             }
 
-            foreach (var file in files)
-            {
                 var fileName = string.Concat(Guid.NewGuid(), Path.GetExtension(ContentDispositionHeaderValue.Parse(file.ContentDisposition).FileName.Trim('"')));
                 var fullPath = Path.Combine(pathToSave, fileName);
                 var dbPath = Path.Combine(folderName, fileName); //you can add this path to a list and then return all dbPaths to the client if require
 
                 Image image = new Image();
                 image.Path = dbPath;
-                image.NewsId = news.Id;
+                image.NewsId = 0;
+            image.UserId = userId;
                 _context.Images.Add(image);
                 using (var stream = new FileStream(fullPath, FileMode.Create))
                 {
                     file.CopyTo(stream);
                 }
-            }
             _context.SaveChanges();
-
-            return news;
+            return image.ImageId;
         }
 
         public IEnumerable<NewsReponse> GetAllByFilter(NewsSearch newsSearch)
