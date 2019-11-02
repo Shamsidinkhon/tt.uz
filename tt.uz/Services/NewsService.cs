@@ -75,13 +75,17 @@ namespace tt.uz.Services
         public IQueryable<News> GetAllByFilter(NewsSearch newsSearch)
         {
 
-            IQueryable<News> news = from n in _context.News select n;
+            IQueryable<News> news = from n in _context.News
+                                    join image in _context.Images on n.Id equals image.NewsId
+                                    select n
+                                    ;
 
             news = news
                 .Include(x => x.Category)
                 .Include(x => x.Price)
                 .Include(x => x.Location)
-                .Include(x => x.ContactDetail);
+                .Include(x => x.ContactDetail)
+                .Include(x => x.Images);
 
             if (newsSearch.OwnerId > 0) {
                 news = news.Where(x => x.OwnerId == newsSearch.OwnerId);

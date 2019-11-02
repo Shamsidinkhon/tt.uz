@@ -35,7 +35,7 @@ namespace tt.uz.Controllers
 
         }
         [HttpPost("add")]
-        public IActionResult Add([FromForm]NewsDTO newsDTO)
+        public IActionResult Add([FromBody]NewsDTO newsDTO)
         {
             // map dto to entity
             var news = _mapper.Map<News>(newsDTO);
@@ -43,9 +43,9 @@ namespace tt.uz.Controllers
             try
             {
                 // save 
-                _newsService.Create(news, newsDTO.ImageIds);
+                var item = _newsService.Create(news, newsDTO.ImageIds);
 
-                return Ok(new { status = true });
+                return Ok(new { status = true, data = item });
             }
             catch (AppException ex)
             {

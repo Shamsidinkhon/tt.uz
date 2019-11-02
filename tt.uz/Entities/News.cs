@@ -43,5 +43,6 @@ namespace tt.uz.Entities
         public int Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
+        public List<Image> Images { get; set; } 
     }
 }
