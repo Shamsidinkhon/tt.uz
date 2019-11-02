@@ -69,6 +69,21 @@ namespace tt.uz.Controllers
             }
         }
 
+        [HttpPost("delete-image")]
+        public IActionResult DeleteImage(int imageId)
+        {
+            // map dto to entity
+            try
+            {
+                return Ok(new { status = true, imageId = _newsService.DeleteImage(imageId, Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name)) });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+        }
+
         [AllowAnonymous]
         [HttpPost("get-all")]
         public IQueryable<News> GetAll([FromBody]NewsSearch newsSearch)

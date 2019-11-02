@@ -16,6 +16,7 @@ namespace tt.uz.Services
         IQueryable<News> GetAllByFilter(NewsSearch newsSearch);
         bool PostFavourite(UserFavourites uf);
         int UploadImage(IFormFile file, int userId);
+        bool DeleteImage(int imageId, int userId);
     }
     public class NewsService : INewsService
     {
@@ -113,6 +114,13 @@ namespace tt.uz.Services
 
         public bool PostFavourite(UserFavourites uf) {
             _context.UserFavourites.Add(uf);
+            _context.SaveChanges();
+            return true;
+        }
+
+        public bool DeleteImage(int imageId, int userId) {
+            var image = _context.Images.SingleOrDefault(x => x.ImageId == imageId && x.UserId == userId);
+            _context.Images.Remove(image);
             _context.SaveChanges();
             return true;
         }
