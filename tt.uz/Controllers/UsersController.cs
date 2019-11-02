@@ -35,7 +35,7 @@ namespace tt.uz.Controllers
         private IVerificationCodeService _vcodeService;
         private readonly AppSettings _appSettings;
         private readonly IHttpClientFactory _clientFactory;
-
+        private IHttpContextAccessor _httpContextAccessor;
 
         public UsersController(
             IUserService userService,
@@ -44,7 +44,8 @@ namespace tt.uz.Controllers
             IOptions<AppSettings> appSettings,
             IVerificationCodeService vcodeService,
             IHttpClientFactory clientFactory,
-            IExternalLoginService externalLoginService)
+            IExternalLoginService externalLoginService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _userService = userService;
             _userTempService = userTempService;
@@ -53,6 +54,7 @@ namespace tt.uz.Controllers
             _vcodeService = vcodeService;
             _clientFactory = clientFactory;
             _externalLoginService = externalLoginService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [AllowAnonymous]
@@ -211,5 +213,13 @@ namespace tt.uz.Controllers
                 }
             });
         }
-    }
+
+        [HttpPost("user-balance")]
+        public int UserBalance()
+        {
+            int userId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+            var user = _userService.GetById(userId);
+            return user.Balance;
+        }
+        }
 }

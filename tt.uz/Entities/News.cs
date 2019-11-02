@@ -43,6 +43,7 @@ namespace tt.uz.Entities
         public int Status { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
+        [NotMapped]
         public List<Image> Images { get; set; } 
     }
 }
