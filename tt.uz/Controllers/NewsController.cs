@@ -121,8 +121,22 @@ namespace tt.uz.Controllers
             }
         }
 
+        [HttpPost("delete-favourite")]
+        public IActionResult DeleteFavourite(int newsId)
+        {
+            try
+            {
+                return Ok(new { status = _newsService.DeleteFavourite(newsId, Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name)) });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+        }
+
         [HttpPost("get-all-favourites")]
-        public List<News> GetAllFavourites([FromBody]NewsSearch newsSearch)
+        public List<News> GetAllFavourites()
         {
             return _newsService.GetAllFavourites(Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
         }

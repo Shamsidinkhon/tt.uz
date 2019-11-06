@@ -16,6 +16,7 @@ namespace tt.uz.Services
         News Create(News news, string imageIds);
         List<News> GetAllByFilter(NewsSearch newsSearch);
         bool PostFavourite(UserFavourites uf);
+        bool DeleteFavourite(int newsId, int userId);
         int UploadImage(IFormFile file, int userId);
         bool DeleteImage(int imageId, int userId);
         List<News> GetAllFavourites(int userId);
@@ -175,6 +176,13 @@ namespace tt.uz.Services
                        };
 
             return news.ToList();
+        }
+
+        public bool DeleteFavourite(int newsId, int userId) {
+            var fav = _context.UserFavourites.SingleOrDefault(x => x.NewsId == newsId && x.UserId == userId);
+            _context.UserFavourites.Remove(fav);
+            _context.SaveChanges();
+            return true;
         }
     }
 }
