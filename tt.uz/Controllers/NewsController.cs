@@ -120,5 +120,11 @@ namespace tt.uz.Controllers
                 return Ok(new { status = false, message = ex.Message });
             }
         }
+
+        [HttpPost("get-all-favourites")]
+        public List<News> GetAllFavourites([FromBody]NewsSearch newsSearch)
+        {
+            return _newsService.GetAllFavourites(Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
+        }
     }
 }

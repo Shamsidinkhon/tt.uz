@@ -18,6 +18,7 @@ namespace tt.uz.Services
         bool PostFavourite(UserFavourites uf);
         int UploadImage(IFormFile file, int userId);
         bool DeleteImage(int imageId, int userId);
+        List<News> GetAllFavourites(int userId);
     }
     public class NewsService : INewsService
     {
@@ -145,6 +146,35 @@ namespace tt.uz.Services
             _context.Images.Remove(image);
             _context.SaveChanges();
             return true;
+        }
+
+        public List<News> GetAllFavourites(int userId)
+        {
+
+            var news = from n in _context.News
+                       join fav in _context.UserFavourites on n.Id equals fav.NewsId
+                       where fav.UserId == userId
+                       select new News()
+                       {
+                           Id = n.Id,
+                           Title = n.Title,
+                           CategoryId = n.CategoryId,
+                           Category = n.Category,
+                           PriceId = n.PriceId,
+                           Price = n.Price,
+                           Description = n.Description,
+                           LocationId = n.LocationId,
+                           Location = n.Location,
+                           ContactDetailId = n.ContactDetailId,
+                           ContactDetail = n.ContactDetail,
+                           Status = n.Status,
+                           CreatedDate = n.CreatedDate,
+                           UpdatedDate = n.UpdatedDate,
+                           OwnerId = n.OwnerId,
+                           Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
+                       };
+
+            return news.ToList();
         }
     }
 }
