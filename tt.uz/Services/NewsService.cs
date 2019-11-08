@@ -173,6 +173,7 @@ namespace tt.uz.Services
                            UpdatedDate = n.UpdatedDate,
                            OwnerId = n.OwnerId,
                            Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
+                           Favourite = false
                        };
 
             return news.ToList();

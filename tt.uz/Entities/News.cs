@@ -44,6 +44,8 @@ namespace tt.uz.Entities
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
         [NotMapped]
-        public List<Image> Images { get; set; } 
+        public List<Image> Images { get; set; }
+        [NotMapped]
+        public bool Favourite { get; set; }
     }
 }
