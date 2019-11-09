@@ -94,14 +94,15 @@ namespace tt.uz.Controllers
             {
                 newsSearch.Status = News.ACTIVE;
             }
-            return _newsService.GetAllByFilter(newsSearch);
+            int userId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+            return _newsService.GetAllByFilter(newsSearch, userId);
         }
 
         [HttpPost("get-all-by-user")]
         public List<News> GetAllByUser([FromBody]NewsSearch newsSearch)
         {
             newsSearch.OwnerId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
-            return _newsService.GetAllByFilter(newsSearch);
+            return _newsService.GetAllByFilter(newsSearch, newsSearch.OwnerId);
         }
 
         [HttpPost("post-favourite")]

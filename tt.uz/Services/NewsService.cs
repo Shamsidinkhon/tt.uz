@@ -14,7 +14,7 @@ namespace tt.uz.Services
     public interface INewsService
     {
         News Create(News news, string imageIds);
-        List<News> GetAllByFilter(NewsSearch newsSearch);
+        List<News> GetAllByFilter(NewsSearch newsSearch, int userId);
         bool PostFavourite(UserFavourites uf);
         bool DeleteFavourite(int newsId, int userId);
         int UploadImage(IFormFile file, int userId);
@@ -79,11 +79,13 @@ namespace tt.uz.Services
             return image.ImageId;
         }
 
-        public List<News> GetAllByFilter(NewsSearch newsSearch)
+        public List<News> GetAllByFilter(NewsSearch newsSearch, int userId)
         {
 
             var news = from n in _context.News
-                       //join image in _context.Images on n.Id equals image.NewsId
+                       join fav in _context.UserFavourites on n.Id equals fav.NewsId
+                        into gj  
+                       from fav in gj.Where(x => x.UserId == userId).DefaultIfEmpty() 
                        select new News()
                        {
                            Id = n.Id,
@@ -102,6 +104,7 @@ namespace tt.uz.Services
                            UpdatedDate = n.UpdatedDate,
                            OwnerId = n.OwnerId,
                            Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
+                           Favourite = fav == null ? false : true
                        };
 
             if (newsSearch.OwnerId > 0)
@@ -136,8 +139,12 @@ namespace tt.uz.Services
 
         public bool PostFavourite(UserFavourites uf)
         {
-            _context.UserFavourites.Add(uf);
-            _context.SaveChanges();
+            var fav = _context.UserFavourites.SingleOrDefault(x => x.NewsId == uf.NewsId && x.UserId == uf.UserId);
+            if (fav == null)
+            {
+                _context.UserFavourites.Add(uf);
+                _context.SaveChanges();
+            }
             return true;
         }
 
