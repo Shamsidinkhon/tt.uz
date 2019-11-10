@@ -21,6 +21,7 @@ namespace tt.uz.Services
         bool DeleteImage(int imageId, int userId);
         List<News> GetAllFavourites(int userId);
         bool PostTariff(Tariff tariff);
+        List<News> GetAllByTariff(int type, int userId);
     }
     public class NewsService : INewsService
     {
@@ -211,6 +212,40 @@ namespace tt.uz.Services
             _context.Tariff.Add(tariff);
             _context.SaveChanges();
             return true;
+        }
+
+        public List<News> GetAllByTariff(int type, int userId)
+        {
+            int[] tariffs = { Tariff.MAIN, Tariff.VIP, Tariff.TOP };
+            if (!tariffs.Contains(type))
+                throw new AppException("Wrong Tariff Type");
+            var news = from n in _context.News
+                       join fav in _context.UserFavourites on n.Id equals fav.NewsId
+                        into gj
+                       from fav in gj.Where(x => x.UserId == userId).DefaultIfEmpty()
+                       join tariff in _context.Tariff on new { id = n.Id, t = type } equals new { id = tariff.NewsId, t = tariff.Type } into tariff
+                       select new News()
+                       {
+                           Id = n.Id,
+                           Title = n.Title,
+                           CategoryId = n.CategoryId,
+                           Category = n.Category,
+                           PriceId = n.PriceId,
+                           Price = n.Price,
+                           Description = n.Description,
+                           LocationId = n.LocationId,
+                           Location = n.Location,
+                           ContactDetailId = n.ContactDetailId,
+                           ContactDetail = n.ContactDetail,
+                           Status = n.Status,
+                           CreatedDate = n.CreatedDate,
+                           UpdatedDate = n.UpdatedDate,
+                           OwnerId = n.OwnerId,
+                           Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
+                           Favourite = fav == null ? false : true
+                       };
+
+                     return news.ToList();
         }
     }
 }

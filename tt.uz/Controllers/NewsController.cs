@@ -157,5 +157,13 @@ namespace tt.uz.Controllers
                 return Ok(new { status = false, message = ex.Message });
             }
         }
+
+        [AllowAnonymous]
+        [HttpPost("get-all-by-tariff")]
+        public List<News> GetAllByTariff(int type)
+        {
+            int userId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+            return _newsService.GetAllByTariff(type, userId);
+        }
     }
 }
