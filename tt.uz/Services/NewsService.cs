@@ -20,6 +20,7 @@ namespace tt.uz.Services
         int UploadImage(IFormFile file, int userId);
         bool DeleteImage(int imageId, int userId);
         List<News> GetAllFavourites(int userId);
+        bool PostTariff(Tariff tariff);
     }
     public class NewsService : INewsService
     {
@@ -189,6 +190,25 @@ namespace tt.uz.Services
         public bool DeleteFavourite(int newsId, int userId) {
             var fav = _context.UserFavourites.SingleOrDefault(x => x.NewsId == newsId && x.UserId == userId);
             _context.UserFavourites.Remove(fav);
+            _context.SaveChanges();
+            return true;
+        }
+
+        public bool PostTariff(Tariff tariff) {
+            int[] tariffs = { Tariff.MAIN, Tariff.VIP, Tariff.TOP };
+            if (!tariffs.Contains(tariff.Type))
+                throw new AppException("Wrong Tariff Type");
+            var user = _context.Users.SingleOrDefault(x => x.Id == tariff.UserId);
+            if(user == null)
+                throw new AppException("User Not Found");
+            var news = _context.News.SingleOrDefault(x => x.Id == tariff.NewsId);
+            if(news == null)
+                throw new AppException("News Not Found");
+            if(news.OwnerId != tariff.UserId)
+                throw new AppException("Wrong News Owner Id");
+            tariff.Days = 7;
+            tariff.ExpireDate = DateHelper.GetDate().AddDays(tariff.Days);
+            _context.Tariff.Add(tariff);
             _context.SaveChanges();
             return true;
         }

@@ -141,5 +141,21 @@ namespace tt.uz.Controllers
         {
             return _newsService.GetAllFavourites(Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
         }
+
+        [HttpPost("post-tariff")]
+        public IActionResult PostTariff([FromBody]TariffDTO tariffDto)
+        {
+            try
+            {
+                var tariff = _mapper.Map<Tariff>(tariffDto);
+                tariff.UserId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+                return Ok(new { status = _newsService.PostTariff(tariff) });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+        }
     }
 }
