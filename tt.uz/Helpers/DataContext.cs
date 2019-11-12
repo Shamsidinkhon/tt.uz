@@ -22,5 +22,6 @@ namespace tt.uz.Helpers
         public DbSet<ExternalLogin> ExternalLogin { get; set; }
         public DbSet<UserFavourites> UserFavourites { get; set; }
         public DbSet<Tariff> Tariff { get; set; }
+        public DbSet<VendorFavourite> VendorFavourite { get; set; }
     }
 }

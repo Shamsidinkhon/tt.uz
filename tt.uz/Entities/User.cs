@@ -16,5 +16,6 @@ namespace tt.uz.Entities
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
         public int Balance { get; set; }
+        public string FullName { get; set; }
     }
 }

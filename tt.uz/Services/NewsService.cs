@@ -22,6 +22,9 @@ namespace tt.uz.Services
         List<News> GetAllFavourites(int userId);
         bool PostTariff(Tariff tariff);
         List<News> GetAllByTariff(int type, int userId);
+        bool PostVendorFavourite(VendorFavourite vf);
+        bool DeleteVendorFavourite(int targetUserId, int userId);
+        List<User> GetVendors(int userId);
     }
     public class NewsService : INewsService
     {
@@ -220,10 +223,8 @@ namespace tt.uz.Services
             if (!tariffs.Contains(type))
                 throw new AppException("Wrong Tariff Type");
             var news = from n in _context.News
-                       join fav in _context.UserFavourites on n.Id equals fav.NewsId
-                        into gj
-                       from fav in gj.Where(x => x.UserId == userId).DefaultIfEmpty()
-                       join tariff in _context.Tariff on new { id = n.Id, t = type } equals new { id = tariff.NewsId, t = tariff.Type } into tariff
+                       join tariff in _context.Tariff on n.Id equals tariff.NewsId
+                       where tariff.Type == type && tariff.ExpireDate >= DateHelper.GetDate()
                        select new News()
                        {
                            Id = n.Id,
@@ -241,11 +242,42 @@ namespace tt.uz.Services
                            CreatedDate = n.CreatedDate,
                            UpdatedDate = n.UpdatedDate,
                            OwnerId = n.OwnerId,
-                           Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
-                           Favourite = fav == null ? false : true
+                           Images = _context.Images.Where(x => x.NewsId == n.Id).ToList()
                        };
-
+                       
                      return news.ToList();
+        }
+
+        public bool PostVendorFavourite(VendorFavourite vf) {
+            var vfModel = _context.VendorFavourite.SingleOrDefault(x => x.TargetUserId == vf.TargetUserId && x.UserId == vf.UserId);
+            if (vfModel == null)
+            {
+                _context.VendorFavourite.Add(vf);
+                _context.SaveChanges();
+            }
+            return true; 
+        }
+
+        public bool DeleteVendorFavourite(int targetUserId, int userId)
+        {
+            var vf = _context.VendorFavourite.SingleOrDefault(x => x.TargetUserId == targetUserId && x.UserId == userId);
+            _context.VendorFavourite.Remove(vf);
+            _context.SaveChanges();
+            return true;
+        }
+
+        public List<User> GetVendors(int userId) {
+            var vendors = from n in _context.Users
+                          join vf in _context.VendorFavourite on n.Id equals vf.TargetUserId
+                          where vf.UserId == userId
+                          select new User()
+                          {
+                              Id = n.Id,
+                              Email = n.Email,
+                              Phone = n.Phone,
+                              FullName = n.FullName
+                          };
+            return vendors.ToList();
         }
     }
 }

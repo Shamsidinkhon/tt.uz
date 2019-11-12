@@ -165,5 +165,43 @@ namespace tt.uz.Controllers
             int userId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
             return _newsService.GetAllByTariff(type, userId);
         }
+
+        [HttpPost("post-vendor-favourite")]
+        public IActionResult PostVendorFavourite(int targetUserId)
+        {
+            try
+            {
+                VendorFavourite vf = new VendorFavourite();
+                vf.TargetUserId = targetUserId;
+                vf.UserId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+                return Ok(new { status = _newsService.PostVendorFavourite(vf) });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost("delete-vendor-favourite")]
+        public IActionResult DeleteVendorFavourite(int targetUserId)
+        {
+            try
+            {
+                return Ok(new { status = _newsService.DeleteVendorFavourite(targetUserId, Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name)) });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost("get-vendors")]
+        public List<User> GetVendorFavourites()
+        {
+            return _newsService.GetVendors(Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
+        }
+
     }
 }
