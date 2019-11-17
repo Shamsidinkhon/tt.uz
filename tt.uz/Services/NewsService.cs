@@ -24,7 +24,7 @@ namespace tt.uz.Services
         List<News> GetAllByTariff(int type, int userId);
         bool PostVendorFavourite(VendorFavourite vf);
         bool DeleteVendorFavourite(int targetUserId, int userId);
-        List<User> GetVendors(int userId);
+        List<UserResponse> GetVendors(int userId);
     }
     public class NewsService : INewsService
     {
@@ -88,9 +88,13 @@ namespace tt.uz.Services
         {
 
             var news = from n in _context.News
+                       join u in _context.Users on n.OwnerId equals u.Id
                        join fav in _context.UserFavourites on n.Id equals fav.NewsId
                         into gj  
-                       from fav in gj.Where(x => x.UserId == userId).DefaultIfEmpty() 
+                       from fav in gj.Where(x => x.UserId == userId).DefaultIfEmpty()
+                       join vfav in _context.VendorFavourite on n.OwnerId equals vfav.TargetUserId
+                        into vf
+                       from vfav in vf.Where(x => x.UserId == userId).DefaultIfEmpty()
                        select new News()
                        {
                            Id = n.Id,
@@ -109,7 +113,14 @@ namespace tt.uz.Services
                            UpdatedDate = n.UpdatedDate,
                            OwnerId = n.OwnerId,
                            Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
-                           Favourite = fav == null ? false : true
+                           Favourite = fav == null ? false : true,
+                           VendorFavourite = vfav == null ? false : true,
+                           OwnerDetails = new UserResponse() {
+                               Id = u.Id,
+                               Email = u.Email,
+                               Phone = u.Phone,
+                               FullName = u.FullName
+                           }
                        };
 
             if (newsSearch.OwnerId > 0)
@@ -266,11 +277,11 @@ namespace tt.uz.Services
             return true;
         }
 
-        public List<User> GetVendors(int userId) {
+        public List<UserResponse> GetVendors(int userId) {
             var vendors = from n in _context.Users
                           join vf in _context.VendorFavourite on n.Id equals vf.TargetUserId
                           where vf.UserId == userId
-                          select new User()
+                          select new UserResponse()
                           {
                               Id = n.Id,
                               Email = n.Email,

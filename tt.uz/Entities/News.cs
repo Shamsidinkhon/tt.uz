@@ -47,5 +47,9 @@ namespace tt.uz.Entities
         public List<Image> Images { get; set; }
         [NotMapped]
         public bool Favourite { get; set; }
+        [NotMapped]
+        public bool VendorFavourite { get; set; }
+        [NotMapped]
+        public UserResponse OwnerDetails { get; set; }
     }
 }

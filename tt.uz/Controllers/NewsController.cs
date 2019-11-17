@@ -198,7 +198,7 @@ namespace tt.uz.Controllers
         }
 
         [HttpPost("get-vendors")]
-        public List<User> GetVendorFavourites()
+        public List<UserResponse> GetVendorFavourites()
         {
             return _newsService.GetVendors(Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
         }
