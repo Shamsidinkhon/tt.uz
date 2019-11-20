@@ -105,7 +105,7 @@ namespace tt.uz.Controllers
             {
                 // save 
                 _userTempService.Create(user, userDto.Password, userDto.IsEmail);
-                return Ok(new { status = true});
+                return Ok(new { status = true });
             }
             catch (AppException ex)
             {
@@ -221,5 +221,5 @@ namespace tt.uz.Controllers
             var user = _userService.GetById(userId);
             return user.Balance;
         }
-        }
+    }
 }

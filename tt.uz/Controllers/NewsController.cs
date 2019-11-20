@@ -23,15 +23,18 @@ namespace tt.uz.Controllers
         private IMapper _mapper;
         private INewsService _newsService;
         private IHttpContextAccessor _httpContextAccessor;
+        private IVendorReviewService _vendorReviewService;
         public NewsController(
             IMapper mapper,
             INewsService newsService,
+             IVendorReviewService vendorReviewService,
             IHttpContextAccessor httpContextAccessor
             )
         {
             _mapper = mapper;
             _newsService = newsService;
             _httpContextAccessor = httpContextAccessor;
+            _vendorReviewService = vendorReviewService;
 
         }
         [HttpPost("add")]
@@ -201,6 +204,36 @@ namespace tt.uz.Controllers
         public List<UserResponse> GetVendorFavourites()
         {
             return _newsService.GetVendors(Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
+        }
+
+        [HttpPost("post-vendor-review")]
+        public IActionResult PostVendorReview([FromBody]VendorReviews vendorReviews)
+        {
+            try
+            {
+                vendorReviews.UserId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+                return Ok(new { status = _vendorReviewService.Add(vendorReviews) });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("get-vendor-reviews")]
+        public IActionResult GetVendorReviews(int targetUserId)
+        {
+            try
+            {
+                return Ok(_vendorReviewService.GetAll(targetUserId));
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
         }
 
     }
