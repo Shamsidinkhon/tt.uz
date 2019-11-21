@@ -18,6 +18,7 @@ namespace tt.uz.Services
         //void Update(User user, string password = null);
         void Delete(int id);
         User CreateExternalUser(User user);
+        UserProfile GetProfile(int id);
     }
 
     public class UserService : IUserService
@@ -210,6 +211,11 @@ namespace tt.uz.Services
             }
 
             return true;
+        }
+
+        public UserProfile GetProfile(int id)
+        {
+            return _context.UserProfile.Find(id);
         }
     }
 }

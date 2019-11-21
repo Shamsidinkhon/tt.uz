@@ -24,6 +24,7 @@ namespace tt.uz.Helpers
         public DbSet<Tariff> Tariff { get; set; }
         public DbSet<VendorFavourite> VendorFavourite { get; set; }
         public DbSet<VendorReviews> VendorReviews { get; set; }
+        public DbSet<UserProfile> UserProfile { get; set; }
 
     }
 }

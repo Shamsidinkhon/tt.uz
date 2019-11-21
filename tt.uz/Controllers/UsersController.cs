@@ -221,5 +221,13 @@ namespace tt.uz.Controllers
             var user = _userService.GetById(userId);
             return user.Balance;
         }
+
+        [HttpPost("get-profile")]
+        public UserProfile GetProfile()
+        {
+            int userId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+            var profile = _userService.GetProfile(userId);
+            return profile;
+        }
     }
 }
