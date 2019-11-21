@@ -17,6 +17,7 @@ namespace tt.uz.Entities
         }
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Surname { get; set; }
         public string Email { get; set; }
@@ -26,6 +27,7 @@ namespace tt.uz.Entities
         public string Latitude { get; set; }
         public int RegionId { get; set; }
         public int DistrictId { get; set; }
+        public int UserId { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
     }

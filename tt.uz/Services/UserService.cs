@@ -215,7 +215,10 @@ namespace tt.uz.Services
 
         public UserProfile GetProfile(int id)
         {
-            return _context.UserProfile.Find(id);
+            var profile = _context.UserProfile.SingleOrDefault(x => x.UserId == id);
+            if (profile == null)
+                return new UserProfile();
+            return profile;
         }
     }
 }

@@ -222,10 +222,10 @@ namespace tt.uz.Controllers
             return user.Balance;
         }
 
+        [AllowAnonymous]
         [HttpPost("get-profile")]
-        public UserProfile GetProfile()
+        public UserProfile GetProfile(int userId)
         {
-            int userId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
             var profile = _userService.GetProfile(userId);
             return profile;
         }
