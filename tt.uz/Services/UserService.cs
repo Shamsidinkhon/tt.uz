@@ -18,7 +18,7 @@ namespace tt.uz.Services
         //void Update(User user, string password = null);
         void Delete(int id);
         User CreateExternalUser(User user);
-        UserProfile GetProfile(int id);
+        UserProfile GetProfile(int id, int currentUserId);
     }
 
     public class UserService : IUserService
@@ -32,7 +32,8 @@ namespace tt.uz.Services
             _vcodeService = vcodeService;
         }
 
-        public User FindByEmail(string email) {
+        public User FindByEmail(string email)
+        {
             var user = _context.Users.SingleOrDefault(x => x.Email == email);
             if (user == null)
                 return null;
@@ -129,7 +130,7 @@ namespace tt.uz.Services
 
         public User CreateExternalUser(User user)
         {
-           
+
             _context.Users.Add(user);
 
             _context.SaveChanges();
@@ -213,11 +214,31 @@ namespace tt.uz.Services
             return true;
         }
 
-        public UserProfile GetProfile(int id)
+        public UserProfile GetProfile(int id, int currentUserId)
         {
             var profile = _context.UserProfile.SingleOrDefault(x => x.UserId == id);
+            var user = _context.Users.SingleOrDefault(x => x.Id == id);
             if (profile == null)
-                return new UserProfile();
+                profile = new UserProfile();
+            profile.VendorFavourite = _context.VendorFavourite.Any(x => x.UserId == currentUserId && x.TargetUserId == id);
+            var facebook = _context.ExternalLogin.SingleOrDefault(x => x.UserId == id);
+            if (facebook != null)
+                profile.FacebookId = facebook.ClientId;
+            if (user != null)
+            {
+                if (profile.Name == null)
+                {
+                    profile.Name = user.FullName;
+                }
+                if (profile.Email == null)
+                {
+                    profile.Email = user.Email;
+                }
+                if (profile.Phone == null)
+                {
+                    profile.Phone = user.Phone;
+                }
+            }
             return profile;
         }
     }

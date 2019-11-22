@@ -226,7 +226,7 @@ namespace tt.uz.Controllers
         [HttpPost("get-profile")]
         public UserProfile GetProfile(int userId)
         {
-            var profile = _userService.GetProfile(userId);
+            var profile = _userService.GetProfile(userId, Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
             return profile;
         }
     }

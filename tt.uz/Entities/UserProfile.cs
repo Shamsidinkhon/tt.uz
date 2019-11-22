@@ -30,5 +30,7 @@ namespace tt.uz.Entities
         public int UserId { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
+        [NotMapped]
+        public bool VendorFavourite { get; set; }
     }
 }
