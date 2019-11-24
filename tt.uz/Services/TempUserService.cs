@@ -37,12 +37,18 @@ namespace tt.uz.Services
                     throw new AppException("Phone \"" + user.Phone + "\" is already taken");
             }
 
+            if (user.ReferrerCode != 0) {
+                if (_context.Users.Any(x => x.ReferralCode == user.ReferrerCode))
+                    throw new AppException("Referrer Code not found");
+            }
+
             byte[] passwordHash, passwordSalt;
             CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
-
+            Random rnd = new Random();
+            user.ReferralCode = rnd.Next(10000, 99999);
             _context.TempUsers.Add(user);
 
             VerificationCode vcode = new VerificationCode

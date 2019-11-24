@@ -89,6 +89,7 @@ namespace tt.uz.Controllers
                     Id = user.Id,
                     Email = user.Email,
                     Phone = user.Phone,
+                    ReferralCode = user.ReferralCode,
                     Token = tokenString
                 }
             });
@@ -209,6 +210,7 @@ namespace tt.uz.Controllers
                     Id = localUser.Id,
                     Email = localUser.Email,
                     Phone = localUser.Phone,
+                    ReferralCode = localUser.ReferralCode,
                     Token = tokenString
                 }
             });

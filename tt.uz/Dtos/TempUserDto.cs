@@ -12,5 +12,6 @@ namespace tt.uz.Dtos
         public string Phone { get; set; }
         public string Password { get; set; }
         public bool IsEmail { get; set; }
+        public int ReferrerCode { get; set; }
     }
 }

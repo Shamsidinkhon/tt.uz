@@ -12,5 +12,7 @@ namespace tt.uz.Entities
         public string Phone { get; set; }
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
+        public int ReferralCode { get; set; }
+        public int ReferrerCode { get; set; }
     }
 }

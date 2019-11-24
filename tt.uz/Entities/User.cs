@@ -17,5 +17,7 @@ namespace tt.uz.Entities
         public byte[] PasswordSalt { get; set; }
         public int Balance { get; set; }
         public string FullName { get; set; }
+        public int ReferralCode { get; set; }
+        public int ReferrerCode { get; set; }
     }
 }
