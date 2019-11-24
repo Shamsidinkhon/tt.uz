@@ -50,6 +50,6 @@ namespace tt.uz.Entities
         [NotMapped]
         public bool VendorFavourite { get; set; }
         [NotMapped]
-        public UserResponse OwnerDetails { get; set; }
+        public UserProfile OwnerDetails { get; set; }
     }
 }

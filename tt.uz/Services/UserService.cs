@@ -238,6 +238,10 @@ namespace tt.uz.Services
                 {
                     profile.Phone = user.Phone;
                 }
+                if (profile.UserId == 0)
+                {
+                    profile.UserId = user.Id;
+                }
             }
             return profile;
         }

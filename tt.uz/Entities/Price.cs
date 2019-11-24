@@ -10,6 +10,8 @@ namespace tt.uz.Entities
 {
     public class Price
     {
+        public const string USD = "USD";
+        public const string UZS = "UZS";
         public Price()
         {
             CreatedDate = DateHelper.GetDate();
@@ -29,6 +31,22 @@ namespace tt.uz.Entities
         public bool Negotiable { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
+        [NotMapped]
+        public string CurrencyLabel
+        {
+            get
+            {
+                switch (Currency)
+                {
+                    case 1:
+                        return UZS;
+                    case 2:
+                        return USD;
+                    default:
+                        return UZS;
+                }
+            }
+        }
 
     }
 }

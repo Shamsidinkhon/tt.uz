@@ -24,7 +24,7 @@ namespace tt.uz.Services
         List<News> GetAllByTariff(int type, int userId);
         bool PostVendorFavourite(VendorFavourite vf);
         bool DeleteVendorFavourite(int targetUserId, int userId);
-        List<UserResponse> GetVendors(int userId);
+        List<UserProfile> GetVendors(int userId);
     }
     public class NewsService : INewsService
     {
@@ -86,15 +86,20 @@ namespace tt.uz.Services
 
         public List<News> GetAllByFilter(NewsSearch newsSearch, int userId)
         {
-
             var news = from n in _context.News
                        join u in _context.Users on n.OwnerId equals u.Id
                        join fav in _context.UserFavourites on n.Id equals fav.NewsId
-                        into gj  
+                        into gj
                        from fav in gj.Where(x => x.UserId == userId).DefaultIfEmpty()
                        join vfav in _context.VendorFavourite on n.OwnerId equals vfav.TargetUserId
                         into vf
                        from vfav in vf.Where(x => x.UserId == userId).DefaultIfEmpty()
+                       join p in _context.UserProfile on n.OwnerId equals p.UserId
+                       into p
+                       from profile in p.DefaultIfEmpty()
+                       join f in _context.ExternalLogin on n.OwnerId equals f.UserId
+                       into f
+                       from facebook in f.DefaultIfEmpty()
                        select new News()
                        {
                            Id = n.Id,
@@ -115,13 +120,24 @@ namespace tt.uz.Services
                            Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
                            Favourite = fav == null ? false : true,
                            VendorFavourite = vfav == null ? false : true,
-                           OwnerDetails = new UserResponse() {
-                               Id = u.Id,
-                               Email = u.Email,
-                               Phone = u.Phone,
-                               FullName = u.FullName
+                           OwnerDetails = new UserProfile()
+                           {
+                               UserId = u.Id,
+                               Name = profile != null ? (profile.Name != null ? profile.Name : u.FullName) : u.FullName,
+                               Surname = profile != null ? (profile.Surname != null ? profile.Surname : u.FullName) : u.FullName,
+                               Email = profile != null ? (profile.Email != null ? profile.Email : u.Email) : u.Email,
+                               Phone = profile != null ? (profile.Phone != null ? profile.Phone : u.Phone) : u.Phone,
+                               FacebookId = facebook != null ? facebook.ClientId : null,
+                               Longtitude = profile != null ? profile.Longtitude : null,
+                               Latitude = profile != null ? profile.Latitude : null,
+                               RegionId = profile != null ? profile.RegionId : 0,
+                               DistrictId = profile != null ? profile.DistrictId : 0,
+                               CreatedDate = profile != null ? profile.CreatedDate : DateHelper.GetDate(),
+                               UpdatedDate = profile != null ? profile.UpdatedDate : DateHelper.GetDate()
                            }
                        };
+
+
 
             if (newsSearch.OwnerId > 0)
             {
@@ -202,24 +218,26 @@ namespace tt.uz.Services
             return news.ToList();
         }
 
-        public bool DeleteFavourite(int newsId, int userId) {
+        public bool DeleteFavourite(int newsId, int userId)
+        {
             var fav = _context.UserFavourites.SingleOrDefault(x => x.NewsId == newsId && x.UserId == userId);
             _context.UserFavourites.Remove(fav);
             _context.SaveChanges();
             return true;
         }
 
-        public bool PostTariff(Tariff tariff) {
+        public bool PostTariff(Tariff tariff)
+        {
             int[] tariffs = { Tariff.MAIN, Tariff.VIP, Tariff.TOP };
             if (!tariffs.Contains(tariff.Type))
                 throw new AppException("Wrong Tariff Type");
             var user = _context.Users.SingleOrDefault(x => x.Id == tariff.UserId);
-            if(user == null)
+            if (user == null)
                 throw new AppException("User Not Found");
             var news = _context.News.SingleOrDefault(x => x.Id == tariff.NewsId);
-            if(news == null)
+            if (news == null)
                 throw new AppException("News Not Found");
-            if(news.OwnerId != tariff.UserId)
+            if (news.OwnerId != tariff.UserId)
                 throw new AppException("Wrong News Owner Id");
             tariff.Days = 7;
             tariff.ExpireDate = DateHelper.GetDate().AddDays(tariff.Days);
@@ -255,18 +273,19 @@ namespace tt.uz.Services
                            OwnerId = n.OwnerId,
                            Images = _context.Images.Where(x => x.NewsId == n.Id).ToList()
                        };
-                       
-                     return news.ToList();
+
+            return news.ToList();
         }
 
-        public bool PostVendorFavourite(VendorFavourite vf) {
+        public bool PostVendorFavourite(VendorFavourite vf)
+        {
             var vfModel = _context.VendorFavourite.SingleOrDefault(x => x.TargetUserId == vf.TargetUserId && x.UserId == vf.UserId);
             if (vfModel == null)
             {
                 _context.VendorFavourite.Add(vf);
                 _context.SaveChanges();
             }
-            return true; 
+            return true;
         }
 
         public bool DeleteVendorFavourite(int targetUserId, int userId)
@@ -277,16 +296,31 @@ namespace tt.uz.Services
             return true;
         }
 
-        public List<UserResponse> GetVendors(int userId) {
-            var vendors = from n in _context.Users
-                          join vf in _context.VendorFavourite on n.Id equals vf.TargetUserId
+        public List<UserProfile> GetVendors(int userId)
+        {
+            var vendors = from u in _context.Users
+                          join vf in _context.VendorFavourite on u.Id equals vf.TargetUserId
                           where vf.UserId == userId
-                          select new UserResponse()
+                          join p in _context.UserProfile on u.Id equals p.UserId
+                       into p
+                          from profile in p.DefaultIfEmpty()
+                          join f in _context.ExternalLogin on u.Id equals f.UserId
+                          into f
+                          from facebook in f.DefaultIfEmpty()
+                          select new UserProfile()
                           {
-                              Id = n.Id,
-                              Email = n.Email,
-                              Phone = n.Phone,
-                              FullName = n.FullName
+                              UserId = u.Id,
+                              Name = profile != null ? (profile.Name != null ? profile.Name : u.FullName) : u.FullName,
+                              Surname = profile != null ? (profile.Surname != null ? profile.Surname : u.FullName) : u.FullName,
+                              Email = profile != null ? (profile.Email != null ? profile.Email : u.Email) : u.Email,
+                              Phone = profile != null ? (profile.Phone != null ? profile.Phone : u.Phone) : u.Phone,
+                              FacebookId = facebook != null ? facebook.ClientId : null,
+                              Longtitude = profile != null ? profile.Longtitude : null,
+                              Latitude = profile != null ? profile.Latitude : null,
+                              RegionId = profile != null ? profile.RegionId : 0,
+                              DistrictId = profile != null ? profile.DistrictId : 0,
+                              CreatedDate = profile != null ? profile.CreatedDate : DateHelper.GetDate(),
+                              UpdatedDate = profile != null ? profile.UpdatedDate : DateHelper.GetDate()
                           };
             return vendors.ToList();
         }
