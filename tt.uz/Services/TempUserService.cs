@@ -38,7 +38,7 @@ namespace tt.uz.Services
             }
 
             if (user.ReferrerCode != 0) {
-                if (_context.Users.Any(x => x.ReferralCode == user.ReferrerCode))
+                if (!_context.Users.Any(x => x.ReferralCode == user.ReferrerCode))
                     throw new AppException("Referrer Code not found");
             }
 
