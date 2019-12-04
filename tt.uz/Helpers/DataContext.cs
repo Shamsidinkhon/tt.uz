@@ -25,6 +25,9 @@ namespace tt.uz.Helpers
         public DbSet<VendorFavourite> VendorFavourite { get; set; }
         public DbSet<VendorReviews> VendorReviews { get; set; }
         public DbSet<UserProfile> UserProfile { get; set; }
+        public DbSet<AttributeOption> AttributeOption { get; set; }
+        public DbSet<CoreAttribute> CoreAttribute { get; set; }
+        public DbSet<AttributeLink> AttributeLink { get; set; }
 
     }
 }
