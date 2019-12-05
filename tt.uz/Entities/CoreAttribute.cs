@@ -17,5 +17,7 @@ namespace tt.uz.Entities
         public int Type { get; set; }
         public string Unit { get; set; }
         public bool Required { get; set; }
+        [NotMapped]
+        public List<AttributeOption> AttributeOptions { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using tt.uz.Dtos;
 using tt.uz.Entities;
+using tt.uz.Helpers;
 using tt.uz.Services;
 
 namespace tt.uz.Controllers
@@ -38,6 +39,23 @@ namespace tt.uz.Controllers
         {
             IEnumerable<CategoryDTO> categories = _categoryService.GetWithChildren();
             return Ok(categories);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("get-category-attributes")]
+        public IActionResult GetCategoryAttributes(int Id)
+        {
+            try
+            {
+                List<CoreAttribute> attributes = _categoryService.GetCategoryAttribites(Id);
+                return Ok(attributes);
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+            
         }
     }
 }
