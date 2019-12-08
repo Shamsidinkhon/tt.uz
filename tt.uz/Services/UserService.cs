@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using tt.uz.Entities;
 using tt.uz.Helpers;
@@ -19,6 +21,7 @@ namespace tt.uz.Services
         void Delete(int id);
         User CreateExternalUser(User user);
         UserProfile GetProfile(int id, int currentUserId);
+        bool ForgetPassword(User user, bool isEmail);
     }
 
     public class UserService : IUserService
@@ -244,6 +247,38 @@ namespace tt.uz.Services
                 }
             }
             return profile;
+        }
+
+        public bool ForgetPassword(User user, bool isEmail)
+        {
+            // validation
+            var u = new User();
+            if (isEmail)
+            {
+                u = _context.Users.SingleOrDefault(x => x.Email == user.Email);
+                if (u == null)
+                    throw new AppException("Email " + user.Email + " not found");
+            }
+            else
+            {
+                u = _context.Users.SingleOrDefault(x => x.Phone == user.Phone);
+                if (u == null)
+                    throw new AppException("Phone " + user.Phone + " not found");
+            }
+
+            byte[] passwordHash, passwordSalt;
+
+            Random rnd = new Random();
+            int tempPass = rnd.Next(111111, 999999);
+            CreatePasswordHash(tempPass.ToString(), out passwordHash, out passwordSalt);
+
+            u.PasswordHash = passwordHash;
+            u.PasswordSalt = passwordSalt;
+
+            _context.Users.Update(u);
+            _context.SaveChanges();
+
+            return _vcodeService.SendPassword(u, tempPass, isEmail);
         }
     }
 }

@@ -231,5 +231,25 @@ namespace tt.uz.Controllers
             var profile = _userService.GetProfile(userId, Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
             return profile;
         }
+
+        [AllowAnonymous]
+        [HttpPost("forget-password")]
+        public IActionResult ForgetPassword([FromBody]TempUserDto userDto)
+        {
+            // map dto to entity
+            var user = _mapper.Map<User>(userDto);
+
+            try
+            {
+                // save 
+                _userService.ForgetPassword(user, userDto.IsEmail);
+                return Ok(new { status = true });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+        }
     }
 }

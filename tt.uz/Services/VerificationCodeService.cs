@@ -19,6 +19,7 @@ namespace tt.uz.Services
     {
         bool Verify(string value, string type, int code, bool isEmail);
         bool Send(VerificationCode vcode);
+        bool SendPassword(User u, int tempPass, bool isEmail);
     }
     public class VerificationCodeService : IVerificationCodeService
     {
@@ -85,6 +86,51 @@ namespace tt.uz.Services
                         {
                            { "mobile_phone", vcode.FieldValue},
                            { "message", string.Concat("Код подтверждения: ", vcode.Code, " tt.uz")}
+                        };
+                    var content = new FormUrlEncodedContent(values);
+                    var client = _clientFactory.CreateClient();
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    var response = client.PostAsync(_appSettings.SmsPostUrl, content);
+                    if (response.Result.IsSuccessStatusCode)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        throw new Exception("Sms send falied");
+                    }
+
+                }
+            }
+            return false;
+        }
+
+        public bool SendPassword(User u, int tempPass, bool isEmail) {
+            if (isEmail)
+            {
+                SmtpClient client = new SmtpClient("mail.tt.uz");
+                client.UseDefaultCredentials = false;
+                client.Port = 587;
+                client.EnableSsl = true;
+                client.Credentials = new NetworkCredential("no_reply@tt.uz", "nkv%tcF.Lp}4");
+
+                MailMessage mailMessage = new MailMessage();
+                mailMessage.From = new MailAddress("no_reply@tt.uz");
+                mailMessage.To.Add(u.Email);
+                mailMessage.Body = "Ваш пароль: " + tempPass.ToString();
+                mailMessage.Subject = "Восстановление пароля TT.uz";
+                client.Send(mailMessage);
+                return true;
+            }
+            else
+            {
+                string token = GetToken();
+                if (!string.IsNullOrWhiteSpace(token))
+                {
+                    var values = new Dictionary<string, string>
+                        {
+                           { "mobile_phone", u.Phone},
+                           { "message", string.Concat("Ваш пароль: ", tempPass, " tt.uz")}
                         };
                     var content = new FormUrlEncodedContent(values);
                     var client = _clientFactory.CreateClient();
