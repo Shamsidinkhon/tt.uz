@@ -47,7 +47,15 @@ namespace tt.uz.Services
                     _context.Images.Update(image);
                 }
             }
+
+            foreach (NewsAttribute newsAttribute in news.NewsAttribute)
+            {
+                newsAttribute.NewsId = news.Id;
+                _context.NewsAttribute.Add(newsAttribute);
+            }
+
             _context.SaveChanges();
+            news.Images = _context.Images.Where(x => x.NewsId == news.Id).ToList();
             return news;
         }
 
@@ -134,7 +142,26 @@ namespace tt.uz.Services
                                DistrictId = profile != null ? profile.DistrictId : 0,
                                CreatedDate = profile != null ? profile.CreatedDate : DateHelper.GetDate(),
                                UpdatedDate = profile != null ? profile.UpdatedDate : DateHelper.GetDate()
-                           }
+                           },
+                           NewsAttribute = (from newsAtr in _context.NewsAttribute
+                                            where newsAtr.NewsId == n.Id
+                                            join atr in _context.CoreAttribute on newsAtr.AttributeId equals atr.Id
+                                            select new NewsAttribute() {
+                                                Id = newsAtr.Id,
+                                                NewsId = newsAtr.NewsId,
+                                                AttributeId = newsAtr.AttributeId,
+                                                Value = newsAtr.Value,
+                                                AttributeInfo = new CoreAttribute() {
+                                                    Id = atr.Id,
+                                                    Name = atr.Name,
+                                                    Title = atr.Title,
+                                                    Type = atr.Type,
+                                                    Unit = atr.Unit,
+                                                    Required = atr.Required
+                                                }
+
+                                            }
+                                           ).ToList(),
                        };
 
 
@@ -212,7 +239,28 @@ namespace tt.uz.Services
                            UpdatedDate = n.UpdatedDate,
                            OwnerId = n.OwnerId,
                            Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
-                           Favourite = false
+                           Favourite = false,
+                           NewsAttribute = (from newsAtr in _context.NewsAttribute
+                                            where newsAtr.NewsId == n.Id
+                                            join atr in _context.CoreAttribute on newsAtr.AttributeId equals atr.Id
+                                            select new NewsAttribute()
+                                            {
+                                                Id = newsAtr.Id,
+                                                NewsId = newsAtr.NewsId,
+                                                AttributeId = newsAtr.AttributeId,
+                                                Value = newsAtr.Value,
+                                                AttributeInfo = new CoreAttribute()
+                                                {
+                                                    Id = atr.Id,
+                                                    Name = atr.Name,
+                                                    Title = atr.Title,
+                                                    Type = atr.Type,
+                                                    Unit = atr.Unit,
+                                                    Required = atr.Required
+                                                }
+
+                                            }
+                                           ).ToList(),
                        };
 
             return news.ToList();
@@ -271,7 +319,28 @@ namespace tt.uz.Services
                            CreatedDate = n.CreatedDate,
                            UpdatedDate = n.UpdatedDate,
                            OwnerId = n.OwnerId,
-                           Images = _context.Images.Where(x => x.NewsId == n.Id).ToList()
+                           Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
+                           NewsAttribute = (from newsAtr in _context.NewsAttribute
+                                            where newsAtr.NewsId == n.Id
+                                            join atr in _context.CoreAttribute on newsAtr.AttributeId equals atr.Id
+                                            select new NewsAttribute()
+                                            {
+                                                Id = newsAtr.Id,
+                                                NewsId = newsAtr.NewsId,
+                                                AttributeId = newsAtr.AttributeId,
+                                                Value = newsAtr.Value,
+                                                AttributeInfo = new CoreAttribute()
+                                                {
+                                                    Id = atr.Id,
+                                                    Name = atr.Name,
+                                                    Title = atr.Title,
+                                                    Type = atr.Type,
+                                                    Unit = atr.Unit,
+                                                    Required = atr.Required
+                                                }
+
+                                            }
+                                           ).ToList(),
                        };
 
             return news.ToList();

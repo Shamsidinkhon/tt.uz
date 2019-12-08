@@ -51,5 +51,7 @@ namespace tt.uz.Entities
         public bool VendorFavourite { get; set; }
         [NotMapped]
         public UserProfile OwnerDetails { get; set; }
+        [NotMapped]
+        public List<NewsAttribute> NewsAttribute { get; set; }
     }
 }

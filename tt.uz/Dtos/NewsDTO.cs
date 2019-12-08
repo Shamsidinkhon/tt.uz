@@ -27,5 +27,6 @@ namespace tt.uz.Dtos
         public int Status { get; set; }
         [Required]
         public string ImageIds { get; set; }
+        public List<NewsAttribute> NewsAttribute { get; set; }
     }
 }

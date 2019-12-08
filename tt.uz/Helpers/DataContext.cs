@@ -28,6 +28,7 @@ namespace tt.uz.Helpers
         public DbSet<AttributeOption> AttributeOption { get; set; }
         public DbSet<CoreAttribute> CoreAttribute { get; set; }
         public DbSet<AttributeLink> AttributeLink { get; set; }
+        public DbSet<NewsAttribute> NewsAttribute { get; set; }
 
     }
 }
