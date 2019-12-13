@@ -29,6 +29,8 @@ namespace tt.uz.Entities
         public int AttributeType { get; set; }
         [NotMapped]
         public IEnumerable<Category> Children { get; set; }
+        [NotMapped]
+        public int CountNews { get; set; }
 
     }
 }

@@ -25,6 +25,7 @@ namespace tt.uz.Services
         bool PostVendorFavourite(VendorFavourite vf);
         bool DeleteVendorFavourite(int targetUserId, int userId);
         List<UserProfile> GetVendors(int userId);
+        List<Category> Search(NewsSearch newsSearch);
     }
     public class NewsService : INewsService
     {
@@ -146,12 +147,14 @@ namespace tt.uz.Services
                            NewsAttribute = (from newsAtr in _context.NewsAttribute
                                             where newsAtr.NewsId == n.Id
                                             join atr in _context.CoreAttribute on newsAtr.AttributeId equals atr.Id
-                                            select new NewsAttribute() {
+                                            select new NewsAttribute()
+                                            {
                                                 Id = newsAtr.Id,
                                                 NewsId = newsAtr.NewsId,
                                                 AttributeId = newsAtr.AttributeId,
                                                 Value = newsAtr.Value,
-                                                AttributeInfo = new CoreAttribute() {
+                                                AttributeInfo = new CoreAttribute()
+                                                {
                                                     Id = atr.Id,
                                                     Name = atr.Name,
                                                     Title = atr.Title,
@@ -392,6 +395,25 @@ namespace tt.uz.Services
                               UpdatedDate = profile != null ? profile.UpdatedDate : DateHelper.GetDate()
                           };
             return vendors.ToList();
+        }
+
+        public List<Category> Search(NewsSearch newsSearch)
+        {
+            var result = (from news in _context.News
+                          join cat in _context.Categories on news.CategoryId equals cat.Id
+                          where news.Title.Contains(newsSearch.Title)
+                          group news by new
+                          {
+                              news.CategoryId,
+                              cat.Name
+                          } into r
+                          select new Category
+                          {
+                              Id = r.Key.CategoryId,
+                              Name = r.Key.Name,
+                              CountNews = r.Count()
+                          }).ToList();
+            return result;
         }
     }
 }

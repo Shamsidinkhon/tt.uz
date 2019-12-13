@@ -236,5 +236,18 @@ namespace tt.uz.Controllers
             }
         }
 
+        [AllowAnonymous]
+        [HttpPost("search")]
+        public List<Category> Search([FromBody]NewsSearch newsSearch)
+        {
+            int[] statuses = { News.ACTIVE };
+
+            if (!statuses.Contains(newsSearch.Status))
+            {
+                newsSearch.Status = News.ACTIVE;
+            }
+            return _newsService.Search(newsSearch);
+        }
+
     }
 }
