@@ -57,5 +57,21 @@ namespace tt.uz.Controllers
             }
             
         }
+
+        [AllowAnonymous]
+        [HttpGet("update-categories")]
+        public IActionResult UpdateCategories()
+        {
+            try
+            {
+                return Ok(_categoryService.UpdateCategories());
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+            
+        }
     }
 }

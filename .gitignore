@@ -338,3 +338,5 @@ ASALocalRun/
 
 # BeatPulse healthcheck temp database
 healthchecksdb
+tt.uz/categories.json
+tt.uz/categoriesWithChildren.json

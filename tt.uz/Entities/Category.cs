@@ -29,7 +29,7 @@ namespace tt.uz.Entities
         public string MobileIcon { get; set; }
         public int AttributeType { get; set; }
         [NotMapped]
-        public IEnumerable<Category> Children { get; set; }
+        public List<Category> Children { get; set; }
         [NotMapped]
         public int CountNews { get; set; }
 

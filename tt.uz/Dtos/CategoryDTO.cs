@@ -20,7 +20,8 @@ namespace tt.uz.Dtos
         public string MetaKeywords { get; set; }
         public int? Sort { get; set; }
         public int Status { get; set; }
-        public string Icon { get; set; }
+        public string WebIcon { get; set; }
+        public string MobileIcon { get; set; }
         public IEnumerable<CategoryDTO> Children { get; set; }
     }
 }
