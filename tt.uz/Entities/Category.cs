@@ -25,7 +25,8 @@ namespace tt.uz.Entities
         public int? Sort { get; set; }
         [DefaultValue(1)]
         public int Status { get; set; }
-        public string Icon { get; set; }
+        public string WebIcon { get; set; }
+        public string MobileIcon { get; set; }
         public int AttributeType { get; set; }
         [NotMapped]
         public IEnumerable<Category> Children { get; set; }
