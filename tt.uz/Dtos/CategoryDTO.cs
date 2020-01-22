@@ -8,10 +8,12 @@ namespace tt.uz.Dtos
 {
     public class CategoryDTO
     {
-        public int Value { get; set; }
+        public int Id { get; set; }
+        public int Value { get { return Id; } }
         public int? ParentId { get; set; }
         public string Slug { get; set; }
-        public string Label { get; set; }
+        public string Name { get; set; }
+        public string Label { get { return Name; } }
         public string Image { get; set; }
         public string ShortDescription { get; set; }
         public string Description { get; set; }
