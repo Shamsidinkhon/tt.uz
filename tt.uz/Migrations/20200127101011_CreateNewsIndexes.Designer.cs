@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using tt.uz.Helpers;
 
 namespace tt.uz.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20200127101011_CreateNewsIndexes")]
+    partial class CreateNewsIndexes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,8 +160,6 @@ namespace tt.uz.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("ExternalLogin");
                 });
 
@@ -263,8 +263,6 @@ namespace tt.uz.Migrations
                     b.Property<string>("Value");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AttributeId");
 
                     b.ToTable("NewsAttribute");
                 });
@@ -385,8 +383,6 @@ namespace tt.uz.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NewsId");
-
                     b.ToTable("UserFavourites");
                 });
 
@@ -422,8 +418,6 @@ namespace tt.uz.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("UserProfile");
                 });
 
@@ -442,8 +436,6 @@ namespace tt.uz.Migrations
                     b.Property<int>("UserId");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TargetUserId");
 
                     b.ToTable("VendorFavourite");
                 });

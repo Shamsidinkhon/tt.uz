@@ -9,6 +9,22 @@ namespace tt.uz.Helpers
 {
     public class DataContext : DbContext
     {
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<News>()
+                .HasIndex(p => p.OwnerId);
+            modelBuilder.Entity<VendorFavourite>()
+                .HasIndex(p => p.TargetUserId);
+            modelBuilder.Entity<UserFavourites>()
+                .HasIndex(p => p.NewsId);
+            modelBuilder.Entity<UserProfile>()
+                .HasIndex(p => p.UserId);
+            modelBuilder.Entity<ExternalLogin>()
+                .HasIndex(p => p.UserId);
+            modelBuilder.Entity<NewsAttribute>()
+                .HasIndex(p => p.AttributeId);
+        }
+
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
         public DbSet<User> Users { get; set; }
         public DbSet<Category> Categories { get; set; }
