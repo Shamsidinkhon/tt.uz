@@ -142,7 +142,8 @@ namespace tt.uz.Services
                                RegionId = profile != null ? profile.RegionId : 0,
                                DistrictId = profile != null ? profile.DistrictId : 0,
                                CreatedDate = profile != null ? profile.CreatedDate : DateHelper.GetDate(),
-                               UpdatedDate = profile != null ? profile.UpdatedDate : DateHelper.GetDate()
+                               UpdatedDate = profile != null ? profile.UpdatedDate : DateHelper.GetDate(),
+                               Rating = _context.VendorReviews.Where(x => x.TargetUserId == u.Id && x.Mark != null).Average(c => Convert.ToInt32(c.Mark)).ToString()
                            },
                            NewsAttribute = (from newsAtr in _context.NewsAttribute
                                             where newsAtr.NewsId == n.Id
