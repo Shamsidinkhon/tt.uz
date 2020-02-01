@@ -36,6 +36,7 @@ namespace tt.uz.Controllers
         private readonly AppSettings _appSettings;
         private readonly IHttpClientFactory _clientFactory;
         private IHttpContextAccessor _httpContextAccessor;
+        private INewsService _newsService;
 
         public UsersController(
             IUserService userService,
@@ -45,7 +46,8 @@ namespace tt.uz.Controllers
             IVerificationCodeService vcodeService,
             IHttpClientFactory clientFactory,
             IExternalLoginService externalLoginService,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            INewsService newsService)
         {
             _userService = userService;
             _userTempService = userTempService;
@@ -55,6 +57,7 @@ namespace tt.uz.Controllers
             _clientFactory = clientFactory;
             _externalLoginService = externalLoginService;
             _httpContextAccessor = httpContextAccessor;
+            _newsService = newsService;
         }
 
         [AllowAnonymous]
@@ -230,6 +233,36 @@ namespace tt.uz.Controllers
         {
             var profile = _userService.GetProfile(userId, Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
             return profile;
+        }
+
+        [HttpPost("update-profile")]
+        public IActionResult UpdateProfile([FromBody]UserProfileDto userProfileDto)
+        {
+            try
+            {
+                return Ok(new { status = _userService.CreateOrUpdateProfile(Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name), userProfileDto) });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost("upload-image")]
+        public IActionResult UploadImage(IFormFile image)
+        {
+            try
+            {
+                var userProfileDto = new UserProfileDto();
+                userProfileDto.ImageId = _newsService.UploadImage(image, Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
+                return Ok(new { status = _userService.CreateOrUpdateProfile(Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name), userProfileDto) });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
         }
 
         [AllowAnonymous]

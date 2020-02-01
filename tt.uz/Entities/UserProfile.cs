@@ -28,11 +28,14 @@ namespace tt.uz.Entities
         public int RegionId { get; set; }
         public int DistrictId { get; set; }
         public int UserId { get; set; }
+        public int ImageId { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
         [NotMapped]
         public bool VendorFavourite { get; set; }
         [NotMapped]
         public string Rating { get; set; }
+        [NotMapped]
+        public Image Image { get; set; }
     }
 }

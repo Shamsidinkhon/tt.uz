@@ -6,6 +6,8 @@ using System.Net.Mail;
 using System.Threading.Tasks;
 using tt.uz.Entities;
 using tt.uz.Helpers;
+using tt.uz.Dtos;
+using AutoMapper;
 
 namespace tt.uz.Services
 {
@@ -21,6 +23,7 @@ namespace tt.uz.Services
         void Delete(int id);
         User CreateExternalUser(User user);
         UserProfile GetProfile(int id, int currentUserId);
+        bool CreateOrUpdateProfile(int currentUserId, UserProfileDto ptofile);
         bool ForgetPassword(User user, bool isEmail);
     }
 
@@ -28,11 +31,13 @@ namespace tt.uz.Services
     {
         private DataContext _context;
         private IVerificationCodeService _vcodeService;
+        private IMapper _mapper;
 
-        public UserService(DataContext context, IVerificationCodeService vcodeService)
+        public UserService(DataContext context, IMapper mapper, IVerificationCodeService vcodeService)
         {
             _context = context;
             _vcodeService = vcodeService;
+            _mapper = mapper;
         }
 
         public User FindByEmail(string email)
@@ -227,6 +232,12 @@ namespace tt.uz.Services
             var facebook = _context.ExternalLogin.SingleOrDefault(x => x.UserId == id);
             if (facebook != null)
                 profile.FacebookId = facebook.ClientId;
+
+            if (profile.ImageId != 0)
+            {
+                profile.Image = _context.Images.SingleOrDefault(x => x.ImageId == profile.ImageId);
+            }
+
             if (user != null)
             {
                 if (profile.Name == null)
@@ -247,6 +258,18 @@ namespace tt.uz.Services
                 }
             }
             return profile;
+        }
+
+        public bool CreateOrUpdateProfile(int currentUserId, UserProfileDto profileDto)
+        {
+            var profile = _context.UserProfile.SingleOrDefault(x => x.UserId == currentUserId);
+
+            if (profile == null)
+                profile = new UserProfile();
+
+            _mapper.Map<UserProfileDto, UserProfile>(profileDto, profile);
+            _context.UserProfile.Update(profile);
+            return _context.SaveChanges() > 0;
         }
 
         public bool ForgetPassword(User user, bool isEmail)
