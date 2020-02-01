@@ -166,6 +166,8 @@ DocProject/Help/html
 
 # Click-Once directory
 publish/
+obj/
+.vscode/
 
 # Publish Web Output
 *.[Pp]ublish.xml
