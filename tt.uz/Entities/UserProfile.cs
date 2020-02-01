@@ -37,5 +37,7 @@ namespace tt.uz.Entities
         public string Rating { get; set; }
         [NotMapped]
         public Image Image { get; set; }
+        [NotMapped]
+        public DateTime UserCreatedAt { get; set; }
     }
 }

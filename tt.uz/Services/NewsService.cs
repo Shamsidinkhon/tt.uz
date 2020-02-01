@@ -132,6 +132,7 @@ namespace tt.uz.Services
                            OwnerDetails = new UserProfile()
                            {
                                UserId = u.Id,
+                               UserCreatedAt = u.CreatedDate,
                                Name = profile != null ? (profile.Name != null ? profile.Name : u.FullName) : u.FullName,
                                Surname = profile != null ? (profile.Surname != null ? profile.Surname : u.FullName) : u.FullName,
                                Email = profile != null ? (profile.Email != null ? profile.Email : u.Email) : u.Email,
