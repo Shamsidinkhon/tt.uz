@@ -23,6 +23,7 @@ namespace tt.uz.Services
         void Delete(int id);
         User CreateExternalUser(User user);
         UserProfile GetProfile(int id, int currentUserId);
+        Image GetProfileImage(int id);
         bool CreateOrUpdateProfile(int currentUserId, UserProfileDto ptofile);
         bool ForgetPassword(User user, bool isEmail);
     }
@@ -264,8 +265,10 @@ namespace tt.uz.Services
         {
             var profile = _context.UserProfile.SingleOrDefault(x => x.UserId == currentUserId);
 
-            if (profile == null)
+            if (profile == null){
                 profile = new UserProfile();
+                profile.UserId = currentUserId;
+            }
 
             _mapper.Map<UserProfileDto, UserProfile>(profileDto, profile);
             _context.UserProfile.Update(profile);
@@ -302,6 +305,10 @@ namespace tt.uz.Services
             _context.SaveChanges();
 
             return _vcodeService.SendPassword(u, tempPass, isEmail);
+        }
+
+        public Image GetProfileImage(int id){
+            return _context.Images.SingleOrDefault(x => x.ImageId == id);
         }
     }
 }

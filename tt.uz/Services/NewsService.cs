@@ -244,7 +244,7 @@ namespace tt.uz.Services
                            UpdatedDate = n.UpdatedDate,
                            OwnerId = n.OwnerId,
                            Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
-                           Favourite = false,
+                           Favourite = true,
                            NewsAttribute = (from newsAtr in _context.NewsAttribute
                                             where newsAtr.NewsId == n.Id
                                             join atr in _context.CoreAttribute on newsAtr.AttributeId equals atr.Id

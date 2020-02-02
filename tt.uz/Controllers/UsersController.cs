@@ -250,19 +250,14 @@ namespace tt.uz.Controllers
         }
 
         [HttpPost("upload-image")]
-        public IActionResult UploadImage(IFormFile image)
+        public Image UploadImage(IFormFile image)
         {
-            try
-            {
-                var userProfileDto = new UserProfileDto();
-                userProfileDto.ImageId = _newsService.UploadImage(image, Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
-                return Ok(new { status = _userService.CreateOrUpdateProfile(Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name), userProfileDto) });
-            }
-            catch (AppException ex)
-            {
-                // return error message if there was an exception
-                return Ok(new { status = false, message = ex.Message });
-            }
+
+            var userProfileDto = new UserProfileDto();
+            userProfileDto.ImageId = _newsService.UploadImage(image, Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
+            _userService.CreateOrUpdateProfile(Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name), userProfileDto);
+            return _userService.GetProfileImage(userProfileDto.ImageId);
+
         }
 
         [AllowAnonymous]
