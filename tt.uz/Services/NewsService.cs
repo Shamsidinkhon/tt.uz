@@ -81,7 +81,7 @@ namespace tt.uz.Services
             var dbPath = Path.Combine(folderName, fileName); //you can add this path to a list and then return all dbPaths to the client if require
 
             Image image = new Image();
-            image.Path = dbPath;
+            image.Path = fileName;
             image.NewsId = 0;
             image.UserId = userId;
             _context.Images.Add(image);

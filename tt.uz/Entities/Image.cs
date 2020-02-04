@@ -17,7 +17,7 @@ namespace tt.uz.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int ImageId { get; set; }
-        public string Path { get; set; }
+        public string @Path { get; set; }
 
         public int NewsId { get; set; }
         public int UserId { get; set; }
