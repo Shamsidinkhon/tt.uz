@@ -39,5 +39,7 @@ namespace tt.uz.Entities
         public Image Image { get; set; }
         [NotMapped]
         public DateTime UserCreatedAt { get; set; }
+        [NotMapped]
+        public int Balance { get; set; }
     }
 }

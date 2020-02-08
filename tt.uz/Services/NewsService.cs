@@ -307,6 +307,9 @@ namespace tt.uz.Services
             var news = from n in _context.News
                        join tariff in _context.Tariff on n.Id equals tariff.NewsId
                        where tariff.Type == type && tariff.ExpireDate >= DateHelper.GetDate()
+                       join fav in _context.UserFavourites on n.Id equals fav.NewsId
+                       into gj
+                       from fav in gj.Where(x => x.UserId == userId).DefaultIfEmpty()
                        select new News()
                        {
                            Id = n.Id,
@@ -325,6 +328,7 @@ namespace tt.uz.Services
                            UpdatedDate = n.UpdatedDate,
                            OwnerId = n.OwnerId,
                            Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
+                           Favourite = fav == null ? false : true,
                            NewsAttribute = (from newsAtr in _context.NewsAttribute
                                             where newsAtr.NewsId == n.Id
                                             join atr in _context.CoreAttribute on newsAtr.AttributeId equals atr.Id

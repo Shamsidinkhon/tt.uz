@@ -257,6 +257,7 @@ namespace tt.uz.Services
                 {
                     profile.UserId = user.Id;
                 }
+                profile.Balance = user.Balance;
             }
             return profile;
         }
