@@ -239,6 +239,11 @@ namespace tt.uz.Services
             var news = from n in _context.News
                        join fav in _context.UserFavourites on n.Id equals fav.NewsId
                        where fav.UserId == userId
+
+                       join i in _context.Images on n.Id equals i.NewsId
+                       into i
+                       from images in i.DefaultIfEmpty()
+
                        select new News()
                        {
                            Id = n.Id,
@@ -256,7 +261,7 @@ namespace tt.uz.Services
                            CreatedDate = n.CreatedDate,
                            UpdatedDate = n.UpdatedDate,
                            OwnerId = n.OwnerId,
-                           Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
+                           Images = i == null ? new List<Image>() : i.ToList(),
                            Favourite = true,
                            NewsAttribute = (from newsAtr in _context.NewsAttribute
                                             where newsAtr.NewsId == n.Id
@@ -320,6 +325,11 @@ namespace tt.uz.Services
             var news = from n in _context.News
                        join tariff in _context.Tariff on n.Id equals tariff.NewsId
                        where tariff.Type == type && tariff.ExpireDate >= DateHelper.GetDate()
+
+                       join i in _context.Images on n.Id equals i.NewsId
+                       into i
+                       from images in i.DefaultIfEmpty()
+
                        select new News()
                        {
                            Id = n.Id,
@@ -337,7 +347,7 @@ namespace tt.uz.Services
                            CreatedDate = n.CreatedDate,
                            UpdatedDate = n.UpdatedDate,
                            OwnerId = n.OwnerId,
-                           Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
+                           Images = i == null ? new List<Image>() : i.ToList(),
                            NewsAttribute = (from newsAtr in _context.NewsAttribute
                                             where newsAtr.NewsId == n.Id
                                             join atr in _context.CoreAttribute on newsAtr.AttributeId equals atr.Id
