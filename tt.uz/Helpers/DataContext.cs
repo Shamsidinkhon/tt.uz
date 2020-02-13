@@ -23,6 +23,12 @@ namespace tt.uz.Helpers
                 .HasIndex(p => p.UserId);
             modelBuilder.Entity<NewsAttribute>()
                 .HasIndex(p => p.AttributeId);
+            modelBuilder.Entity<Image>()
+                .HasIndex(p => p.NewsId);
+            modelBuilder.Entity<VendorReviews>()
+                .HasIndex(p => p.TargetUserId);
+            modelBuilder.Entity<NewsAttribute>()
+                .HasIndex(p => p.NewsId);
         }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }

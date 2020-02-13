@@ -97,18 +97,31 @@ namespace tt.uz.Services
         {
             var news = from n in _context.News
                        join u in _context.Users on n.OwnerId equals u.Id
+
                        join fav in _context.UserFavourites on n.Id equals fav.NewsId
                         into gj
                        from fav in gj.Where(x => x.UserId == userId).DefaultIfEmpty()
+
                        join vfav in _context.VendorFavourite on n.OwnerId equals vfav.TargetUserId
                         into vf
                        from vfav in vf.Where(x => x.UserId == userId).DefaultIfEmpty()
+
                        join p in _context.UserProfile on n.OwnerId equals p.UserId
                        into p
                        from profile in p.DefaultIfEmpty()
+
                        join f in _context.ExternalLogin on n.OwnerId equals f.UserId
                        into f
                        from facebook in f.DefaultIfEmpty()
+
+                       join i in _context.Images on n.Id equals i.NewsId
+                       into i
+                       from images in i.DefaultIfEmpty()
+
+                       join vr in _context.VendorReviews on u.Id equals vr.TargetUserId
+                       into vr
+                       from vrs in vr.DefaultIfEmpty()
+
                        select new News()
                        {
                            Id = n.Id,
@@ -126,7 +139,7 @@ namespace tt.uz.Services
                            CreatedDate = n.CreatedDate,
                            UpdatedDate = n.UpdatedDate,
                            OwnerId = n.OwnerId,
-                           Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
+                           Images = i == null ? new List<Image>() : i.ToList(),
                            Favourite = fav == null ? false : true,
                            VendorFavourite = vfav == null ? false : true,
                            OwnerDetails = new UserProfile()
@@ -144,7 +157,7 @@ namespace tt.uz.Services
                                DistrictId = profile != null ? profile.DistrictId : 0,
                                CreatedDate = profile != null ? profile.CreatedDate : DateHelper.GetDate(),
                                UpdatedDate = profile != null ? profile.UpdatedDate : DateHelper.GetDate(),
-                               Rating = _context.VendorReviews.Where(x => x.TargetUserId == u.Id && x.Mark != null).Average(c => Convert.ToInt32(c.Mark)).ToString()
+                               Rating = vr.Average(c => Convert.ToInt32(c.Mark)).ToString()
                            },
                            NewsAttribute = (from newsAtr in _context.NewsAttribute
                                             where newsAtr.NewsId == n.Id
