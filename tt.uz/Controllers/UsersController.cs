@@ -279,5 +279,22 @@ namespace tt.uz.Controllers
                 return Ok(new { status = false, message = ex.Message });
             }
         }
+
+        [HttpPost("contact")]
+        public IActionResult Contact([FromBody]ContactDTO contactDto)
+        {
+            try
+            {
+                var contact = _mapper.Map<Contact>(contactDto);
+                contact.UserId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+                _userService.ContactAdd(contact);
+                return Ok(new { status = true });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+        }
     }
 }

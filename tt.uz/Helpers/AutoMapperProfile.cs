@@ -20,6 +20,7 @@ namespace tt.uz.Helpers
             CreateMap<Category, CategoryDTO>().ForMember(x => x.Value, opt => opt.MapFrom(src => src.Id)).ForMember(x => x.Label, opt => opt.MapFrom(src => src.Name));
             CreateMap<TariffDTO, Tariff>();
             CreateMap<UserProfileDto, UserProfile>();
+            CreateMap<ContactDTO, Contact>();
         }
     }
 }

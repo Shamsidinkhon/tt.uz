@@ -51,6 +51,7 @@ namespace tt.uz.Helpers
         public DbSet<CoreAttribute> CoreAttribute { get; set; }
         public DbSet<AttributeLink> AttributeLink { get; set; }
         public DbSet<NewsAttribute> NewsAttribute { get; set; }
+        public DbSet<Contact> Contact { get; set; }
 
     }
 }

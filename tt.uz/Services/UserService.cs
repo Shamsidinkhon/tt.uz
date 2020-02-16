@@ -26,6 +26,7 @@ namespace tt.uz.Services
         Image GetProfileImage(int id);
         bool CreateOrUpdateProfile(int currentUserId, UserProfileDto ptofile);
         bool ForgetPassword(User user, bool isEmail);
+        Contact ContactAdd(Contact contact);
     }
 
     public class UserService : IUserService
@@ -310,6 +311,12 @@ namespace tt.uz.Services
 
         public Image GetProfileImage(int id){
             return _context.Images.SingleOrDefault(x => x.ImageId == id);
+        }
+
+        public Contact ContactAdd(Contact contact){
+            _context.Contact.Add(contact);
+            _context.SaveChanges();
+            return contact;
         }
     }
 }
