@@ -15,5 +15,7 @@ namespace tt.uz.Entities
         public int AttributeId { get; set; }
         public int Position { get; set; }
         public string Value { get; set; }
+        [NotMapped]
+        public string Label { get { return Value; } }
     }
 }
