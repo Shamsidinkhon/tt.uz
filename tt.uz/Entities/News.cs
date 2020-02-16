@@ -14,6 +14,7 @@ namespace tt.uz.Entities
         public const int ACTIVE = 2;
         public const int REJECTED = 3;
         public const int ARCHIVE = 4;
+        public const int DELETED = 5;
         public News() {
             CreatedDate = DateHelper.GetDate();
             UpdatedDate = DateHelper.GetDate();

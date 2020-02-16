@@ -57,6 +57,26 @@ namespace tt.uz.Controllers
             }
         }
 
+/*         [HttpPost("change-status")]
+        public IActionResult ChangeStatus(int newsId, int status)
+        {
+            // map dto to entity
+            var news = _mapper.Map<News>(newsDTO);
+            news.OwnerId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+            try
+            {
+                // save 
+                var item = _newsService.Create(news, newsDTO.ImageIds);
+
+                return Ok(new { status = true, data = item });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+        } */
+
         [HttpPost("upload-image")]
         public IActionResult UploadImage(IFormFile image)
         {
