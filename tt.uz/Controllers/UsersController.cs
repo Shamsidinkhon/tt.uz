@@ -114,7 +114,7 @@ namespace tt.uz.Controllers
             catch (AppException ex)
             {
                 // return error message if there was an exception
-                return Ok(new { status = false, message = ex.Message });
+                return Ok(new { code = false, message = ex.Message });
             }
         }
 
@@ -126,7 +126,7 @@ namespace tt.uz.Controllers
             {
                 return Ok(new
                 {
-                    status = _vcodeService.Verify(
+                    code = _vcodeService.Verify(
                     vCode.IsEmail ? vCode.Email : vCode.Phone,
                     vCode.IsEmail ? VerificationCode.EMAIL : VerificationCode.PHONE,
                     vCode.Code,
@@ -138,7 +138,7 @@ namespace tt.uz.Controllers
             catch (AppException ex)
             {
                 // return error message if there was an exception
-                return BadRequest(new { status = false, message = ex.Message });
+                return BadRequest(new { code = false, message = ex.Message });
             }
         }
 
@@ -158,7 +158,7 @@ namespace tt.uz.Controllers
 
             if (!userAccessTokenValidation.Data.IsValid)
             {
-                return BadRequest(new { status = false, message = "Invalid facebook token." });
+                return BadRequest(new { code = false, message = "Invalid facebook token." });
             }
 
             // 3. we've got a valid token so we can request user data from fb
@@ -183,7 +183,7 @@ namespace tt.uz.Controllers
 
             if (localUser == null)
             {
-                return BadRequest(new { status = false, message = "Failed to create local user account." });
+                return BadRequest(new { code = false, message = "Failed to create local user account." });
             }
 
             _externalLoginService.CreateOrUpdate(localUser, userInfo, ExternalLogin.FACEBOOK);
@@ -245,7 +245,7 @@ namespace tt.uz.Controllers
             catch (AppException ex)
             {
                 // return error message if there was an exception
-                return Ok(new { status = false, message = ex.Message });
+                return Ok(new { code = false, message = ex.Message });
             }
         }
 
@@ -276,7 +276,7 @@ namespace tt.uz.Controllers
             catch (AppException ex)
             {
                 // return error message if there was an exception
-                return Ok(new { status = false, message = ex.Message });
+                return Ok(new { code = false, message = ex.Message });
             }
         }
 
@@ -293,7 +293,7 @@ namespace tt.uz.Controllers
             catch (AppException ex)
             {
                 // return error message if there was an exception
-                return Ok(new { status = false, message = ex.Message });
+                return Ok(new { code = false, message = ex.Message });
             }
         }
     }

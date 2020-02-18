@@ -53,7 +53,7 @@ namespace tt.uz.Controllers
             catch (AppException ex)
             {
                 // return error message if there was an exception
-                return Ok(new { status = false, message = ex.Message });
+                return Ok(new { code = false, message = ex.Message });
             }
             
         }
@@ -69,7 +69,7 @@ namespace tt.uz.Controllers
             catch (AppException ex)
             {
                 // return error message if there was an exception
-                return Ok(new { status = false, message = ex.Message });
+                return Ok(new { code = false, message = ex.Message });
             }
             
         }
