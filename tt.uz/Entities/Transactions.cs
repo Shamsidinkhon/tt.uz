@@ -8,9 +8,9 @@ using tt.uz.Helpers;
 
 namespace tt.uz.Entities
 {
-    public class Transactions
+    public class TransactionEntity
     {
-        public Transactions()
+        public TransactionEntity()
         {
             CreateTime = DateHelper.GetDate();
         }

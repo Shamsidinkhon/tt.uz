@@ -52,7 +52,7 @@ namespace tt.uz.Helpers
         public DbSet<AttributeLink> AttributeLink { get; set; }
         public DbSet<NewsAttribute> NewsAttribute { get; set; }
         public DbSet<Contact> Contact { get; set; }
-        public DbSet<Transactions> Transactions { get; set; }
+        public DbSet<TransactionEntity> Transactions { get; set; }
 
     }
 }

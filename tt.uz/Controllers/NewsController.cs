@@ -8,6 +8,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using tt.uz.Dtos;
 using tt.uz.Entities;
 using tt.uz.Helpers;
@@ -24,11 +25,13 @@ namespace tt.uz.Controllers
         private INewsService _newsService;
         private IHttpContextAccessor _httpContextAccessor;
         private IVendorReviewService _vendorReviewService;
+        private readonly AppSettings _appSettings;
         public NewsController(
             IMapper mapper,
             INewsService newsService,
              IVendorReviewService vendorReviewService,
-            IHttpContextAccessor httpContextAccessor
+            IHttpContextAccessor httpContextAccessor,
+             IOptions<AppSettings> appSettings
             )
         {
             _mapper = mapper;
