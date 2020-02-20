@@ -9,6 +9,6 @@ namespace tt.uz.Transactions
     {
         public string Id { get; set; }
         public string Method { get; set; }
-        public List<string> Params { get; set; }
+        public Params Params { get; set; }
     }
 }

@@ -98,6 +98,7 @@ namespace tt.uz
             services.AddScoped<INewsService, NewsService>();
             services.AddScoped<IExternalLoginService, ExternalLoginService>();
             services.AddScoped<IVendorReviewService, VendorReviewService>();
+            services.AddScoped<IPaymeService, PaymeService>();
             services.AddHttpClient();
         }
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Primitives;
 using tt.uz.Helpers;
+using tt.uz.Services;
 using tt.uz.Transactions;
 
 namespace tt.uz.Controllers
@@ -15,9 +16,11 @@ namespace tt.uz.Controllers
     [ApiController]
     public class TransactionsController : ControllerBase
     {
-        public TransactionsController(IConfiguration configuration)
+        private IPaymeService _paymeService;
+        public TransactionsController(IConfiguration configuration, IPaymeService paymeService)
         {
             Configuration = configuration;
+            _paymeService = paymeService;
         }
 
         public IConfiguration Configuration { get; }
@@ -27,7 +30,7 @@ namespace tt.uz.Controllers
             try
             {
                 new Merchant().Authorize(Request, Configuration);
-                return Ok(new { result = new { }, id = request.Id });
+                return Ok(new { result = _paymeService.ProcessTransaction(request), id = request.Id });
             }
             catch (AppException ex)
             {
