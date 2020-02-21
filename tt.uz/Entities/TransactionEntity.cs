@@ -10,6 +10,19 @@ namespace tt.uz.Entities
 {
     public class TransactionEntity
     {
+        public const int TIMEOUT = 43200000;
+        public const int STATE_CREATED = 1;
+        public const int STATE_COMPLETED = 2;
+        public const int STATE_CANCELLED = -1;
+        public const int STATE_CANCELLED_AFTER_COMPLETE = -2;
+
+        public const int REASON_RECEIVERS_NOT_FOUND = 1;
+        public const int REASON_PROCESSING_EXECUTION_FAILED = 2;
+        public const int REASON_EXECUTION_FAILED = 3;
+        public const int REASON_CANCELLED_BY_TIMEOUT = 4;
+        public const int REASON_FUND_RETURNED = 5;
+        public const int REASON_UNKNOWN = 10;
+
         public TransactionEntity()
         {
             CreateTime = DateHelper.GetDate();
@@ -35,6 +48,11 @@ namespace tt.uz.Entities
         public string Receivers { get; set; }
         [Required]
         public int UserId { get; set; }
+        public bool isExpired()
+        {
+            return State == STATE_CREATED && Math.Abs(CreateTime.TimeOfDay.TotalMilliseconds * 1000 - DateHelper.GetDate().TimeOfDay.TotalMilliseconds * 1000) > TIMEOUT;
+        }
 
     }
+
 }

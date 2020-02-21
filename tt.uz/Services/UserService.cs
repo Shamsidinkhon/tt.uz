@@ -27,6 +27,8 @@ namespace tt.uz.Services
         bool CreateOrUpdateProfile(int currentUserId, UserProfileDto ptofile);
         bool ForgetPassword(User user, bool isEmail);
         Contact ContactAdd(Contact contact);
+        bool AddAmountToBalance(int userId, int amount);
+        bool SubstractAmountFromBalance(int userId, int amount);
     }
 
     public class UserService : IUserService
@@ -267,7 +269,8 @@ namespace tt.uz.Services
         {
             var profile = _context.UserProfile.SingleOrDefault(x => x.UserId == currentUserId);
 
-            if (profile == null){
+            if (profile == null)
+            {
                 profile = new UserProfile();
                 profile.UserId = currentUserId;
             }
@@ -309,14 +312,45 @@ namespace tt.uz.Services
             return _vcodeService.SendPassword(u, tempPass, isEmail);
         }
 
-        public Image GetProfileImage(int id){
+        public Image GetProfileImage(int id)
+        {
             return _context.Images.SingleOrDefault(x => x.ImageId == id);
         }
 
-        public Contact ContactAdd(Contact contact){
+        public Contact ContactAdd(Contact contact)
+        {
             _context.Contact.Add(contact);
             _context.SaveChanges();
             return contact;
         }
+
+        public bool AddAmountToBalance(int userId, int amount)
+        {
+            var user = _context.Users.Find(userId);
+            if (user != null)
+            {
+                user.Balance += amount;
+                _context.Users.Update(user);
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+
+        public bool SubstractAmountFromBalance(int userId, int amount)
+        {
+            var user = _context.Users.Find(userId);
+            if (user != null)
+            {
+                if (user.Balance < amount)
+                    return false;
+                user.Balance -= amount;
+                _context.Users.Update(user);
+                _context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
+
     }
 }

@@ -35,7 +35,7 @@ namespace tt.uz.Controllers
             catch (AppException ex)
             {
                 // return error message if there was an exception
-                return Ok(new { error = new { code = ex.Code, message = new { en = ex.Message } }, id = request.Id });
+                return Ok(new { error = new { code = ex.Code, message = ex.Message }, id = request.Id });
             }
         }
     }
