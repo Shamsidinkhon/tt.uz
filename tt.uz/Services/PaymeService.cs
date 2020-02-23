@@ -83,10 +83,10 @@ namespace tt.uz.Services
 
             return new
             {
-                create_time = transaction.CreateTime.TimeOfDay.TotalSeconds,
-                perform_time = transaction.PerformTime.TimeOfDay.TotalSeconds,
-                cancel_time = transaction.CancelTime.TimeOfDay.TotalSeconds,
-                transaction = transaction.Id,
+                create_time = Convert.ToInt64(transaction.PaycomTime),
+                perform_time = DateHelper.GetTotalMillisecondsByDate(transaction.PerformTime),
+                cancel_time = DateHelper.GetTotalMillisecondsByDate(transaction.CancelTime),
+                transaction = transaction.Id.ToString(),
                 state = transaction.State,
                 reason = transaction.Reason
             };
@@ -124,15 +124,15 @@ namespace tt.uz.Services
                 {
                     return new
                     {
-                        create_time = transaction.CreateTime.TimeOfDay.TotalSeconds,
-                        transaction = transaction.Id,
+                        create_time = Convert.ToInt64(transaction.PaycomTime),
+                        transaction = transaction.Id.ToString(),
                         state = transaction.State
                     };
                 }
             }
             else
             {
-                if (long.Parse(request.Params.Time) - DateHelper.GetDate().TimeOfDay.TotalMilliseconds * 1000 >= TransactionEntity.TIMEOUT)
+                if (Convert.ToInt64(request.Params.Time) - DateHelper.GetTotalMilliseconds() >= TransactionEntity.TIMEOUT)
                 {
                     throw new AppException(string.Concat("Since create time of the transaction passed ", TransactionEntity.TIMEOUT, "ms"), -31008);
                 }
@@ -141,9 +141,10 @@ namespace tt.uz.Services
             if (transaction == null)
                 transaction = new TransactionEntity();
 
+
             transaction.PaycomTransactionId = request.Params.Id;
             transaction.PaycomTime = request.Params.Time;
-            transaction.PaycomTimeDatetime = DateHelper.UnixTimeStampToDateTime(long.Parse(request.Params.Time));
+            transaction.PaycomTimeDatetime = DateHelper.UnixTimeStampToDateTime(double.Parse(request.Params.Time));
             transaction.State = TransactionEntity.STATE_CREATED;
             transaction.Amount = request.Params.Amount;
             transaction.UserId = user.Id;
@@ -152,8 +153,8 @@ namespace tt.uz.Services
 
             return new
             {
-                create_time = DateHelper.GetTotalSeconds(),
-                transaction = transaction.Id,
+                create_time = Convert.ToInt64(transaction.PaycomTime),
+                transaction = transaction.Id.ToString(),
                 state = transaction.State
             };
         }
@@ -179,16 +180,16 @@ namespace tt.uz.Services
                         _context.SaveChanges();
                         return new
                         {
-                            perform_time = DateHelper.GetDate().TimeOfDay.TotalSeconds,
-                            transaction = transaction.Id,
+                            perform_time = DateHelper.GetTotalMillisecondsByDate(transaction.PerformTime),
+                            transaction = transaction.Id.ToString(),
                             state = transaction.State
                         };
                     }
                 case TransactionEntity.STATE_COMPLETED:
                     return new
                     {
-                        perform_time = transaction.PerformTime.TimeOfDay.TotalSeconds,
-                        transaction = transaction.Id,
+                        perform_time = DateHelper.GetTotalMillisecondsByDate(transaction.PerformTime),
+                        transaction = transaction.Id.ToString(),
                         state = transaction.State
                     };
                 default:
@@ -207,16 +208,16 @@ namespace tt.uz.Services
                 case TransactionEntity.STATE_CANCELLED_AFTER_COMPLETE:
                     return new
                     {
-                        cancel_time = transaction.CancelTime.TimeOfDay.TotalSeconds,
-                        transaction = transaction.Id,
+                        cancel_time = DateHelper.GetTotalMillisecondsByDate(transaction.CancelTime),
+                        transaction = transaction.Id.ToString(),
                         state = transaction.State
                     };
                 case TransactionEntity.STATE_CREATED:
                     Cancel(transaction, request.Params.Reason);
                     return new
                     {
-                        cancel_time = transaction.CancelTime.TimeOfDay.TotalSeconds,
-                        transaction = transaction.Id,
+                        cancel_time = DateHelper.GetTotalMillisecondsByDate(transaction.CancelTime),
+                        transaction = transaction.Id.ToString(),
                         state = transaction.State
                     };
                 case TransactionEntity.STATE_COMPLETED:
@@ -224,8 +225,8 @@ namespace tt.uz.Services
                     _userService.SubstractAmountFromBalance(transaction.UserId, transaction.Amount);
                     return new
                     {
-                        cancel_time = transaction.CancelTime.TimeOfDay.TotalSeconds,
-                        transaction = transaction.Id,
+                        cancel_time = DateHelper.GetTotalMillisecondsByDate(transaction.CancelTime),
+                        transaction = transaction.Id.ToString(),
                         state = transaction.State
                     };
                 default:
@@ -255,9 +256,9 @@ namespace tt.uz.Services
             return new
             {
                 transactions = _context.Transactions.Where(
-                    x => x.PaycomTimeDatetime >= DateHelper.UnixTimeStampToDateTime(long.Parse(request.Params.From))
+                    x => x.PaycomTimeDatetime >= DateHelper.UnixTimeStampToDateTime(double.Parse(request.Params.From))
                     &&
-                   x.PaycomTimeDatetime < DateHelper.UnixTimeStampToDateTime(long.Parse(request.Params.To))
+                   x.PaycomTimeDatetime < DateHelper.UnixTimeStampToDateTime(double.Parse(request.Params.To))
                     )
             };
         }

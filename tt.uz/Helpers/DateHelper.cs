@@ -25,27 +25,47 @@ namespace tt.uz.Helpers
                 return TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("Asia/Tashkent")).AddMinutes(minut);
             return TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("West Asia Standard Time")).AddMinutes(minut);
         }
-        public static DateTime UnixTimeStampToDateTime(long unixTimeStamp)
+        public static DateTime UnixTimeStampToDateTime(double unixTimeStamp)
         {
             // Unix timestamp is seconds past epoch
-            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-            dtDateTime = dtDateTime.AddSeconds(unixTimeStamp).ToLocalTime();
+            DateTime dtDateTime = getEpoch();
+            dtDateTime = dtDateTime.AddMilliseconds(unixTimeStamp).ToLocalTime();
             return dtDateTime;
         }
-        public static double GetTotalMilliseconds()
+        public static Int64 GetTotalMilliseconds()
         {
             // Unix timestamp is seconds past epoch
-            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            DateTime dtDateTime = getEpoch();
             TimeSpan diff = GetDate() - dtDateTime;
-            return diff.TotalMilliseconds;
+            return Convert.ToInt64(diff.TotalMilliseconds);
         }
 
         public static double GetTotalSeconds()
         {
             // Unix timestamp is seconds past epoch
-            DateTime dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            DateTime dtDateTime = getEpoch();
             TimeSpan diff = GetDate() - dtDateTime;
             return diff.TotalSeconds;
+        }
+
+        public static double GetTotalSecondsByDate(DateTime date)
+        {
+            // Unix timestamp is seconds past epoch
+            DateTime dtDateTime = getEpoch();
+            TimeSpan diff = date - dtDateTime;
+            return diff.TotalSeconds;
+        }
+
+        public static Int64 GetTotalMillisecondsByDate(DateTime date)
+        {
+            // Unix timestamp is seconds past epoch
+            DateTime dtDateTime = getEpoch();
+            TimeSpan diff = date - dtDateTime;
+            return Convert.ToInt64(diff.TotalMilliseconds);
+        }
+
+        public static DateTime getEpoch(){
+            return new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
         }
     }
 }

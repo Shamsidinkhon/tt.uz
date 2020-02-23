@@ -228,9 +228,12 @@ namespace tt.uz.Services
         public bool DeleteImage(int imageId, int userId)
         {
             var image = _context.Images.SingleOrDefault(x => x.ImageId == imageId && x.UserId == userId);
-            _context.Images.Remove(image);
-            _context.SaveChanges();
-            return true;
+            if(image != null){
+                _context.Images.Remove(image);
+                _context.SaveChanges();
+                return true;
+            }
+            throw new AppException("Image Not Found");
         }
 
         public List<News> GetAllFavourites(int userId)

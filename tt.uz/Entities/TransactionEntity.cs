@@ -50,7 +50,7 @@ namespace tt.uz.Entities
         public int UserId { get; set; }
         public bool isExpired()
         {
-            return State == STATE_CREATED && Math.Abs(CreateTime.TimeOfDay.TotalMilliseconds * 1000 - DateHelper.GetDate().TimeOfDay.TotalMilliseconds * 1000) > TIMEOUT;
+            return State == STATE_CREATED && Math.Abs(DateHelper.GetTotalMillisecondsByDate(CreateTime) - DateHelper.GetTotalMilliseconds()) > TIMEOUT;
         }
 
     }
