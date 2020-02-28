@@ -20,24 +20,45 @@
             </div>
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class ="form-control" asp-items="ViewBag.CategoryId"></select>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
+            </div>
+
+            <hr>
+            <h5>Детали Цены</h5>
+            <div class="form-group">
+                <label asp-for="Price.Amount" class="control-label">Цена</label>
+                <input asp-for="Price.Amount" class="form-control" />
+                <span asp-validation-for="Price.Amount" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="PriceId" class="control-label"></label>
-                <select asp-for="PriceId" class ="form-control" asp-items="ViewBag.PriceId"></select>
+                <label asp-for="Price.Currency" class="control-label">Валюта</label>
+                <select asp-for="Price.Currency" class="form-control">
+                    <option value="2">usd</option>
+                    <option value="1">uzs</option>
+                </select>
             </div>
+            <div class="form-group">
+                <label asp-for="Price.Exchange" class="control-label">Возможен торг</label>
+                <input type="checkbox" asp-for="Price.Exchange" value="Возможен торг" class="btn btn-primary" />
+            </div>
+
+            <hr>
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
                 <input asp-for="Description" class="form-control" />
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
+
+            <hr>
+            <h5>Сведения О Местоположении</h5>
             <div class="form-group">
                 <label asp-for="LocationId" class="control-label"></label>
-                <select asp-for="LocationId" class ="form-control" asp-items="ViewBag.LocationId"></select>
+                <select asp-for="LocationId" class="form-control" asp-items="ViewBag.LocationId"></select>
             </div>
+
             <div class="form-group">
                 <label asp-for="ContactDetailId" class="control-label"></label>
-                <select asp-for="ContactDetailId" class ="form-control" asp-items="ViewBag.ContactDetailId"></select>
+                <select asp-for="ContactDetailId" class="form-control" asp-items="ViewBag.ContactDetailId"></select>
             </div>
             <div class="form-group">
                 <label asp-for="OwnerId" class="control-label"></label>

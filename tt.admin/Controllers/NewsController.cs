@@ -54,9 +54,6 @@ namespace tt.admin.Controllers
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Set<Category>(), "Id", "Id");
-            ViewData["ContactDetailId"] = new SelectList(_context.Set<ContactDetail>(), "ContactDetailId", "ContactDetailId");
-            ViewData["LocationId"] = new SelectList(_context.Set<Location>(), "LocationId", "LocationId");
-            ViewData["PriceId"] = new SelectList(_context.Set<Price>(), "PriceId", "PriceId");
             return View();
         }
 
