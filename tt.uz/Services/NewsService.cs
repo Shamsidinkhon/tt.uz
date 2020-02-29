@@ -14,7 +14,7 @@ namespace tt.uz.Services
     public interface INewsService
     {
         News Create(News news, string imageIds);
-        List<News> GetAllByFilter(NewsSearch newsSearch, int userId);
+        PagedList<News> GetAllByFilter(NewsSearch newsSearch, int userId);
         bool PostFavourite(UserFavourites uf);
         bool DeleteFavourite(int newsId, int userId);
         int UploadImage(IFormFile file, int userId);
@@ -93,7 +93,7 @@ namespace tt.uz.Services
             return image.ImageId;
         }
 
-        public List<News> GetAllByFilter(NewsSearch newsSearch, int userId)
+        public PagedList<News> GetAllByFilter(NewsSearch newsSearch, int userId)
         {
             var news = from n in _context.News
                        join u in _context.Users on n.OwnerId equals u.Id
@@ -211,7 +211,7 @@ namespace tt.uz.Services
                 news = news.Where(x => x.Title.Contains(newsSearch.Title));
             }
 
-            return news.ToList();
+            return PagedList<News>.ToPagedList(news, newsSearch.PageNumber, newsSearch.PageSize);
         }
 
         public bool PostFavourite(UserFavourites uf)

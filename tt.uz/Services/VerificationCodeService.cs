@@ -48,10 +48,12 @@ namespace tt.uz.Services
             var tempUser = isEmail ? _context.TempUsers.OrderByDescending(x => x.Id).FirstOrDefault(x => x.Email == value) : _context.TempUsers.OrderByDescending(x => x.Id).FirstOrDefault(x => x.Phone == value);
             var user = _mapper.Map<User>(tempUser);
 
-            var referrar = _context.Users.SingleOrDefault(x => x.ReferralCode == tempUser.ReferrerCode);
-            if (referrar != null) {
-                referrar.Balance += 10;
-                _context.Users.Update(referrar);
+            if(tempUser.ReferrerCode != 0){
+                var referrar = _context.Users.FirstOrDefault(x => x.ReferralCode == tempUser.ReferrerCode);
+                if (referrar != null) {
+                    referrar.Balance += 10;
+                    _context.Users.Update(referrar);
+                }
             }
 
             _context.Users.Add(user);

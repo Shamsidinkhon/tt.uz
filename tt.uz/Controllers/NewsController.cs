@@ -13,6 +13,7 @@ using tt.uz.Dtos;
 using tt.uz.Entities;
 using tt.uz.Helpers;
 using tt.uz.Services;
+using Newtonsoft.Json;
 
 namespace tt.uz.Controllers
 {
@@ -60,25 +61,25 @@ namespace tt.uz.Controllers
             }
         }
 
-/*         [HttpPost("change-status")]
-        public IActionResult ChangeStatus(int newsId, int status)
-        {
-            // map dto to entity
-            var news = _mapper.Map<News>(newsDTO);
-            news.OwnerId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
-            try
-            {
-                // save 
-                var item = _newsService.Create(news, newsDTO.ImageIds);
+        /*         [HttpPost("change-status")]
+                public IActionResult ChangeStatus(int newsId, int status)
+                {
+                    // map dto to entity
+                    var news = _mapper.Map<News>(newsDTO);
+                    news.OwnerId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+                    try
+                    {
+                        // save 
+                        var item = _newsService.Create(news, newsDTO.ImageIds);
 
-                return Ok(new { status = true, data = item });
-            }
-            catch (AppException ex)
-            {
-                // return error message if there was an exception
-                return Ok(new { status = false, message = ex.Message });
-            }
-        } */
+                        return Ok(new { status = true, data = item });
+                    }
+                    catch (AppException ex)
+                    {
+                        // return error message if there was an exception
+                        return Ok(new { status = false, message = ex.Message });
+                    }
+                } */
 
         [HttpPost("upload-image")]
         public IActionResult UploadImage(IFormFile image)
@@ -112,7 +113,7 @@ namespace tt.uz.Controllers
 
         [AllowAnonymous]
         [HttpPost("get-all")]
-        public List<News> GetAll([FromBody]NewsSearch newsSearch)
+        public PagedList<News> GetAll([FromBody]NewsSearch newsSearch)
         {
             int[] statuses = { News.ACTIVE };
 
@@ -121,7 +122,20 @@ namespace tt.uz.Controllers
                 newsSearch.Status = News.ACTIVE;
             }
             int userId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
-            return _newsService.GetAllByFilter(newsSearch, userId);
+            var news = _newsService.GetAllByFilter(newsSearch, userId);
+
+            var metadata = new
+            {
+                news.TotalCount,
+                news.PageSize,
+                news.CurrentPage,
+                news.TotalPages,
+                news.HasNext,
+                news.HasPrevious
+            };
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+
+            return news;
         }
 
         [HttpPost("get-all-by-user")]
