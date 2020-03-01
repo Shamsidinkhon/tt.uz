@@ -13,8 +13,11 @@ namespace tt.uz.Entities
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
+        
         public int? ParentId { get; set; }
+        [Required]
         public string Slug { get; set; }
+        [Required]
         public string Name { get; set; }
         public string Image { get; set; }
         public string ShortDescription { get; set; }
@@ -22,6 +25,7 @@ namespace tt.uz.Entities
         public string MetaTitle { get; set; }
         public string MetaDescription { get; set; }
         public string MetaKeywords { get; set; }
+        [Required]
         public int? Sort { get; set; }
         [DefaultValue(1)]
         public int Status { get; set; }

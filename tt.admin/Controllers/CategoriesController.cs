@@ -56,8 +56,9 @@ namespace tt.admin.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ParentId,Slug,Name,Image,ShortDescription,Description,MetaTitle,MetaDescription,MetaKeywords,Sort,Status,WebIcon,MobileIcon,AttributeType")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,ParentId,Slug,Name,Image,ShortDescription,Description,MetaTitle,MetaDescription,MetaKeywords,Sort,WebIcon,MobileIcon,AttributeType")] Category category)
         {
+            category.Status = 1;
             if (ModelState.IsValid)
             {
                 _context.Add(category);
