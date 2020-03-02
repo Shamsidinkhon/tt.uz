@@ -29,6 +29,8 @@ namespace tt.uz.Helpers
                 .HasIndex(p => p.TargetUserId);
             modelBuilder.Entity<NewsAttribute>()
                 .HasIndex(p => p.NewsId);
+            modelBuilder.Entity<Tariff>()
+                .HasIndex(p => p.NewsId);
         }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }

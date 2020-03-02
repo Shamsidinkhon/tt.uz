@@ -122,6 +122,9 @@ namespace tt.uz.Services
                        into vr
                        from vrs in vr.DefaultIfEmpty()
 
+                       join tariff in _context.Tariff on n.Id equals tariff.NewsId
+                       into tariff
+                       from tariffs in tariff.Where(x => x.ExpireDate >= DateHelper.GetDate()).DefaultIfEmpty()
                        select new News()
                        {
                            Id = n.Id,
@@ -142,6 +145,7 @@ namespace tt.uz.Services
                            Images = i == null ? new List<Image>() : i.ToList(),
                            Favourite = fav == null ? false : true,
                            VendorFavourite = vfav == null ? false : true,
+                           Tariffs = tariff.ToList(),
                            OwnerDetails = new UserProfile()
                            {
                                UserId = u.Id,
@@ -211,7 +215,7 @@ namespace tt.uz.Services
                 news = news.Where(x => x.Title.Contains(newsSearch.Title));
             }
 
-            return PagedList<News>.ToPagedList(news, newsSearch.PageNumber, newsSearch.PageSize);
+            return PagedList<News>.ToPagedList(news.Distinct(), newsSearch.PageNumber, newsSearch.PageSize);
         }
 
         public bool PostFavourite(UserFavourites uf)

@@ -54,5 +54,7 @@ namespace tt.uz.Entities
         public UserProfile OwnerDetails { get; set; }
         [NotMapped]
         public List<NewsAttribute> NewsAttribute { get; set; }
+        [NotMapped]
+        public List<Tariff> Tariffs { get; set; }
     }
 }

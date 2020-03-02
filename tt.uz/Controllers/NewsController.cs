@@ -134,6 +134,7 @@ namespace tt.uz.Controllers
                 news.HasPrevious
             };
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+            Response.Headers.Add("Access-Control-Expose-Headers", "*");
 
             return news;
         }

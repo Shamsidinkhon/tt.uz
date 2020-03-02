@@ -51,7 +51,7 @@ namespace tt.uz.Services
             if(tempUser.ReferrerCode != 0){
                 var referrar = _context.Users.FirstOrDefault(x => x.ReferralCode == tempUser.ReferrerCode);
                 if (referrar != null) {
-                    referrar.Balance += 10;
+                    referrar.Balance += 10000;
                     _context.Users.Update(referrar);
                 }
             }
