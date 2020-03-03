@@ -14,14 +14,14 @@ namespace tt.uz.Services
     public interface INewsService
     {
         News Create(News news, string imageIds);
-        PagedList<News> GetAllByFilter(NewsSearch newsSearch, int userId);
+        PagedListNews GetAllByFilter(NewsSearch newsSearch);
         bool PostFavourite(UserFavourites uf);
         bool DeleteFavourite(int newsId, int userId);
         int UploadImage(IFormFile file, int userId);
         bool DeleteImage(int imageId, int userId);
-        List<News> GetAllFavourites(int userId);
+        PagedListNews GetAllFavourites(NewsSearch newsSearch);
         bool PostTariff(Tariff tariff);
-        List<News> GetAllByTariff(int type, int userId);
+        PagedListNews GetAllByTariff(NewsSearch newsSearch);
         bool PostVendorFavourite(VendorFavourite vf);
         bool DeleteVendorFavourite(int targetUserId, int userId);
         List<UserProfile> GetVendors(int userId);
@@ -93,18 +93,18 @@ namespace tt.uz.Services
             return image.ImageId;
         }
 
-        public PagedList<News> GetAllByFilter(NewsSearch newsSearch, int userId)
+        public PagedListNews GetAllByFilter(NewsSearch newsSearch)
         {
             var news = from n in _context.News
                        join u in _context.Users on n.OwnerId equals u.Id
 
                        join fav in _context.UserFavourites on n.Id equals fav.NewsId
                         into gj
-                       from fav in gj.Where(x => x.UserId == userId).DefaultIfEmpty()
+                       from fav in gj.Where(x => x.UserId == newsSearch.OwnerId).DefaultIfEmpty()
 
                        join vfav in _context.VendorFavourite on n.OwnerId equals vfav.TargetUserId
                         into vf
-                       from vfav in vf.Where(x => x.UserId == userId).DefaultIfEmpty()
+                       from vfav in vf.Where(x => x.UserId == newsSearch.OwnerId).DefaultIfEmpty()
 
                        join p in _context.UserProfile on n.OwnerId equals p.UserId
                        into p
@@ -163,29 +163,7 @@ namespace tt.uz.Services
                                UpdatedDate = profile != null ? profile.UpdatedDate : DateHelper.GetDate(),
                                Rating = vr.Average(c => Convert.ToInt32(c.Mark)).ToString()
                            },
-                           NewsAttribute = (from newsAtr in _context.NewsAttribute
-                                            where newsAtr.NewsId == n.Id
-                                            join atr in _context.CoreAttribute on newsAtr.AttributeId equals atr.Id
-                                            select new NewsAttribute()
-                                            {
-                                                Id = newsAtr.Id,
-                                                NewsId = newsAtr.NewsId,
-                                                AttributeId = newsAtr.AttributeId,
-                                                Value = newsAtr.Value,
-                                                AttributeInfo = new CoreAttribute()
-                                                {
-                                                    Id = atr.Id,
-                                                    Name = atr.Name,
-                                                    Title = atr.Title,
-                                                    Type = atr.Type,
-                                                    Unit = atr.Unit,
-                                                    Required = atr.Required
-                                                }
-
-                                            }
-                                           ).ToList(),
                        };
-
 
 
             if (newsSearch.OwnerId > 0)
@@ -214,8 +192,8 @@ namespace tt.uz.Services
             {
                 news = news.Where(x => x.Title.Contains(newsSearch.Title));
             }
-
-            return PagedList<News>.ToPagedList(news.Distinct(), newsSearch.PageNumber, newsSearch.PageSize);
+            news = news.GroupBy(item => item.Id).Select(group => group.FirstOrDefault());
+            return PagedListNews.ToPagedList(news, newsSearch.PageNumber, newsSearch.PageSize, _context);
         }
 
         public bool PostFavourite(UserFavourites uf)
@@ -232,7 +210,8 @@ namespace tt.uz.Services
         public bool DeleteImage(int imageId, int userId)
         {
             var image = _context.Images.SingleOrDefault(x => x.ImageId == imageId && x.UserId == userId);
-            if(image != null){
+            if (image != null)
+            {
                 _context.Images.Remove(image);
                 _context.SaveChanges();
                 return true;
@@ -240,12 +219,12 @@ namespace tt.uz.Services
             throw new AppException("Image Not Found");
         }
 
-        public List<News> GetAllFavourites(int userId)
+        public PagedListNews GetAllFavourites(NewsSearch newsSearch)
         {
 
             var news = from n in _context.News
                        join fav in _context.UserFavourites on n.Id equals fav.NewsId
-                       where fav.UserId == userId
+                       where fav.UserId == newsSearch.OwnerId
 
                        join i in _context.Images on n.Id equals i.NewsId
                        into i
@@ -270,30 +249,26 @@ namespace tt.uz.Services
                            OwnerId = n.OwnerId,
                            Images = i == null ? new List<Image>() : i.ToList(),
                            Favourite = true,
-                           NewsAttribute = (from newsAtr in _context.NewsAttribute
-                                            where newsAtr.NewsId == n.Id
-                                            join atr in _context.CoreAttribute on newsAtr.AttributeId equals atr.Id
-                                            select new NewsAttribute()
-                                            {
-                                                Id = newsAtr.Id,
-                                                NewsId = newsAtr.NewsId,
-                                                AttributeId = newsAtr.AttributeId,
-                                                Value = newsAtr.Value,
-                                                AttributeInfo = new CoreAttribute()
-                                                {
-                                                    Id = atr.Id,
-                                                    Name = atr.Name,
-                                                    Title = atr.Title,
-                                                    Type = atr.Type,
-                                                    Unit = atr.Unit,
-                                                    Required = atr.Required
-                                                }
-
-                                            }
-                                           ).ToList(),
                        };
 
-            return news.ToList();
+            if (newsSearch.Id > 0)
+            {
+                news = news.Where(x => x.Id == newsSearch.Id);
+            }
+
+            if (newsSearch.CategoryId > 0)
+            {
+                news = news.Where(x => x.CategoryId == newsSearch.CategoryId);
+            }
+
+            if (!string.IsNullOrEmpty(newsSearch.Title))
+            {
+                news = news.Where(x => x.Title.Contains(newsSearch.Title));
+            }
+
+
+            news = news.GroupBy(item => item.Id).Select(group => group.FirstOrDefault());
+            return PagedListNews.ToPagedList(news, newsSearch.PageNumber, newsSearch.PageSize, _context);
         }
 
         public bool DeleteFavourite(int newsId, int userId)
@@ -324,23 +299,23 @@ namespace tt.uz.Services
             return true;
         }
 
-        public List<News> GetAllByTariff(int type, int userId)
+        public PagedListNews GetAllByTariff(NewsSearch newsSearch)
         {
             int[] tariffs = { Tariff.MAIN, Tariff.VIP, Tariff.TOP };
-            if (!tariffs.Contains(type))
+            if (!tariffs.Contains(newsSearch.Type))
                 throw new AppException("Wrong Tariff Type");
             var news = from n in _context.News
                        join tariff in _context.Tariff on n.Id equals tariff.NewsId
-                       where tariff.Type == type && tariff.ExpireDate >= DateHelper.GetDate()
-                       
+                       where tariff.Type == newsSearch.Type && tariff.ExpireDate >= DateHelper.GetDate()
+
                        join fav in _context.UserFavourites on n.Id equals fav.NewsId
                        into gj
-                       from fav in gj.Where(x => x.UserId == userId).DefaultIfEmpty()
-                       
+                       from fav in gj.Where(x => x.UserId == newsSearch.OwnerId).DefaultIfEmpty()
+
                        join i in _context.Images on n.Id equals i.NewsId
                        into i
                        from images in i.DefaultIfEmpty()
-                       
+
                        select new News()
                        {
                            Id = n.Id,
@@ -360,30 +335,25 @@ namespace tt.uz.Services
                            OwnerId = n.OwnerId,
                            Images = _context.Images.Where(x => x.NewsId == n.Id).ToList(),
                            Favourite = fav == null ? false : true,
-                           NewsAttribute = (from newsAtr in _context.NewsAttribute
-                                            where newsAtr.NewsId == n.Id
-                                            join atr in _context.CoreAttribute on newsAtr.AttributeId equals atr.Id
-                                            select new NewsAttribute()
-                                            {
-                                                Id = newsAtr.Id,
-                                                NewsId = newsAtr.NewsId,
-                                                AttributeId = newsAtr.AttributeId,
-                                                Value = newsAtr.Value,
-                                                AttributeInfo = new CoreAttribute()
-                                                {
-                                                    Id = atr.Id,
-                                                    Name = atr.Name,
-                                                    Title = atr.Title,
-                                                    Type = atr.Type,
-                                                    Unit = atr.Unit,
-                                                    Required = atr.Required
-                                                }
-
-                                            }
-                                           ).ToList(),
                        };
 
-            return news.ToList();
+            if (newsSearch.Id > 0)
+            {
+                news = news.Where(x => x.Id == newsSearch.Id);
+            }
+
+            if (newsSearch.CategoryId > 0)
+            {
+                news = news.Where(x => x.CategoryId == newsSearch.CategoryId);
+            }
+
+            if (!string.IsNullOrEmpty(newsSearch.Title))
+            {
+                news = news.Where(x => x.Title.Contains(newsSearch.Title));
+            }
+
+            news = news.GroupBy(item => item.Id).Select(group => group.FirstOrDefault());
+            return PagedListNews.ToPagedList(news, newsSearch.PageNumber, newsSearch.PageSize, _context);
         }
 
         public bool PostVendorFavourite(VendorFavourite vf)
