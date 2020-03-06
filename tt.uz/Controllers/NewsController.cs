@@ -121,7 +121,7 @@ namespace tt.uz.Controllers
             {
                 newsSearch.Status = News.ACTIVE;
             }
-            newsSearch.OwnerId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+            newsSearch.UserId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
             var news = _newsService.GetAllByFilter(newsSearch);
 
             var metadata = new

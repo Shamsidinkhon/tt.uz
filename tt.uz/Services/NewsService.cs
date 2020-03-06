@@ -107,11 +107,11 @@ namespace tt.uz.Services
 
                        join fav in _context.UserFavourites on n.Id equals fav.NewsId
                         into gj
-                       from fav in gj.Where(x => x.UserId == newsSearch.OwnerId).DefaultIfEmpty()
+                       from fav in gj.Where(x => x.UserId == newsSearch.UserId).DefaultIfEmpty()
 
                        join vfav in _context.VendorFavourite on n.OwnerId equals vfav.TargetUserId
                         into vf
-                       from vfav in vf.Where(x => x.UserId == newsSearch.OwnerId).DefaultIfEmpty()
+                       from vfav in vf.Where(x => x.UserId == newsSearch.UserId).DefaultIfEmpty()
 
                        join p in _context.UserProfile on n.OwnerId equals p.UserId
                        into p

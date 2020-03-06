@@ -11,6 +11,7 @@ namespace tt.uz.Entities
         public string Title { get; set; }
         public int CategoryId { get; set; }
         public int OwnerId { get; set; }
+        public int UserId { get; set; }
         public int Status { get; set; }
         public int Type { get; set; }
 
