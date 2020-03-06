@@ -11,6 +11,7 @@
 *.sln.docstates
 tt.uz/categories.json
 tt.uz/categoriesWithChildren.json
+tt.uz/regions.json
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs

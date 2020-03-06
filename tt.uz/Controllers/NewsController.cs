@@ -324,5 +324,43 @@ namespace tt.uz.Controllers
             return _newsService.Search(newsSearch);
         }
 
+        [AllowAnonymous]
+        [HttpGet("update-regions")]
+        public IActionResult UpdateRegions()
+        {
+            try
+            {
+                return Ok(_newsService.UpdateRegions());
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { code = false, message = ex.Message });
+            }
+
+        }
+        [AllowAnonymous]
+        [HttpGet("get-regions")]
+        public IActionResult GetRegions(string lang)
+        {
+            try
+            {
+                string[] langs = { "ru", "uz", "oz" };
+                if (string.IsNullOrEmpty(lang) || !langs.Contains(lang))
+                    lang = "ru";
+                IEnumerable<Region> regions = _newsService.GetRegions(lang);
+                return Ok(regions);
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new
+                {
+                    code = false,
+                    message = ex.Message
+                });
+            }
+
+        }
     }
 }

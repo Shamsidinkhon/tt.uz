@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 using tt.uz.Entities;
 using tt.uz.Helpers;
 using Microsoft.EntityFrameworkCore;
+using tt.uz.Dtos;
+using Newtonsoft.Json;
+using AutoMapper;
 
 namespace tt.uz.Services
 {
@@ -26,13 +29,17 @@ namespace tt.uz.Services
         bool DeleteVendorFavourite(int targetUserId, int userId);
         List<UserProfile> GetVendors(int userId);
         List<Category> Search(NewsSearch newsSearch);
+        bool UpdateRegions();
+        IEnumerable<Region> GetRegions(string lang = "ru");
     }
     public class NewsService : INewsService
     {
         private DataContext _context;
-        public NewsService(DataContext context)
+        private IMapper _mapper;
+        public NewsService(DataContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         public News Create(News news, string imageIds)
         {
@@ -421,6 +428,33 @@ namespace tt.uz.Services
                               CountNews = r.Count()
                           }).ToList();
             return result;
+        }
+        public bool UpdateRegions()
+        {
+            UpdateRegionsByLang("ru");
+            UpdateRegionsByLang("uz");
+            UpdateRegionsByLang("oz");
+            return true;
+        }
+
+        private bool UpdateRegionsByLang(string lang)
+        {
+            var regions = _context.Region;
+
+            var reg = regions.Where(x => x.Available == 1 && x.Depth == 2 && x.Lang == lang).OrderBy(x => x.Title);
+            foreach (Region r in reg)
+            {
+                r.Districts = regions.Where(x => x.Available == 1 && x.SoatoId == r.ParentId && x.Lang == lang).OrderBy(x => x.Title).ToList();
+            }
+            string json = JsonConvert.SerializeObject(reg.ToList());
+            System.IO.File.WriteAllText(@"regions_" + lang + ".json", json);
+            return true;
+        }
+
+        public IEnumerable<Region> GetRegions(string lang = "ru")
+        {
+            var regions = JsonConvert.DeserializeObject<IEnumerable<Region>>(System.IO.File.ReadAllText(@"regions_" + lang + ".json"));
+            return _mapper.Map<IEnumerable<Region>>(regions);
         }
     }
 }
