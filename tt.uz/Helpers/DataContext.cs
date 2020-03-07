@@ -56,6 +56,7 @@ namespace tt.uz.Helpers
         public DbSet<Contact> Contact { get; set; }
         public DbSet<TransactionEntity> Transactions { get; set; }
         public DbSet<Region> Region { get; set; }
+        public DbSet<LegalEntity> LegalEntity { get; set; }
 
     }
 }

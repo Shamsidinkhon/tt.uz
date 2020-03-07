@@ -327,5 +327,27 @@ namespace tt.uz.Controllers
                 return Ok(new { code = false, message = ex.Message });
             }
         }
+        [HttpPost("add-business-entity")]
+        public IActionResult AddBusinessEntity([FromBody]LegalEntityDto legalEntityDto)
+        {
+            try
+            {
+                var businessEntity = _mapper.Map<LegalEntity>(legalEntityDto);
+                businessEntity.UserId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+                _userService.AddBusinessEntity(businessEntity);
+                return Ok(new { status = true });
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { code = false, message = ex.Message });
+            }
+        }
+        [HttpGet("get-business-entities")]
+        public List<LegalEntity> GetBusinessEntities()
+        {
+            var entities = _userService.GetBusinessEntities(Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
+            return entities;
+        }
     }
 }

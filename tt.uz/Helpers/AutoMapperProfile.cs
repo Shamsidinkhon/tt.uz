@@ -21,6 +21,7 @@ namespace tt.uz.Helpers
             CreateMap<TariffDTO, Tariff>();
             CreateMap<UserProfileDto, UserProfile>();
             CreateMap<ContactDTO, Contact>();
+            CreateMap<LegalEntityDto, LegalEntity>();
         }
     }
 }

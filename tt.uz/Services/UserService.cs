@@ -29,6 +29,8 @@ namespace tt.uz.Services
         Contact ContactAdd(Contact contact);
         bool AddAmountToBalance(int userId, int amount);
         bool SubstractAmountFromBalance(int userId, int amount);
+        LegalEntity AddBusinessEntity(LegalEntity entity);
+        List<LegalEntity> GetBusinessEntities(int userId);
     }
 
     public class UserService : IUserService
@@ -352,5 +354,16 @@ namespace tt.uz.Services
             return false;
         }
 
+        public LegalEntity AddBusinessEntity(LegalEntity entity)
+        {
+            _context.LegalEntity.Add(entity);
+            _context.SaveChanges();
+            return entity;
+        }
+
+        public List<LegalEntity> GetBusinessEntities(int userId)
+        {
+            return _context.LegalEntity.Where(x => x.UserId == userId).ToList();
+        }
     }
 }
