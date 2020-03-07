@@ -445,7 +445,7 @@ namespace tt.uz.Services
             var reg = regions.Where(x => x.Available == 1 && x.Depth == 2 && x.Lang == lang).OrderBy(x => x.Title);
             foreach (Region r in reg)
             {
-                r.Districts = regions.Where(x => x.Available == 1 && x.SoatoId == r.ParentId && x.Lang == lang).OrderBy(x => x.Title).ToList();
+                r.Children = regions.Where(x => x.Available == 1 && x.SoatoId == r.ParentId && x.Lang == lang).OrderBy(x => x.Title).ToList();
             }
             string json = JsonConvert.SerializeObject(reg.ToList());
             System.IO.File.WriteAllText(@"regions_" + lang + ".json", json);
