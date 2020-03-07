@@ -52,23 +52,6 @@ namespace tt.uz.Services
 
             CheckAmount(request.Params.Amount);
 
-            var transaction = _context.Transactions.SingleOrDefault(x => x.PaycomTransactionId == request.Params.Id);
-
-            if (transaction == null)
-            {
-                var states = new int[] { TransactionEntity.STATE_CREATED, TransactionEntity.STATE_COMPLETED };
-                transaction = _context.Transactions.SingleOrDefault(x => x.UserId == int.Parse(request.Params.Account.UserId) && states.Contains(x.State));
-            }
-
-            if (transaction != null)
-            {
-                if (transaction.State == TransactionEntity.STATE_CREATED || transaction.State == TransactionEntity.STATE_COMPLETED)
-                    throw new AppException("There is other active/completed transaction for this order.", -31008);
-
-                if (user.Id != transaction.UserId)
-                    throw new AppException("User is not owner of this transaction", -31050);
-            }
-
             return new
             {
                 allow = true
@@ -99,23 +82,10 @@ namespace tt.uz.Services
 
             CheckAmount(request.Params.Amount);
 
-            var states = new int[] { TransactionEntity.STATE_CREATED, TransactionEntity.STATE_COMPLETED };
-            var transaction = _context.Transactions.SingleOrDefault(x => x.UserId == int.Parse(request.Params.Account.UserId) && states.Contains(x.State));
-
+            var transaction = _context.Transactions.SingleOrDefault(x => x.PaycomTransactionId == request.Params.Id);
             if (transaction != null)
             {
-                if ((transaction.State == TransactionEntity.STATE_CREATED || transaction.State == TransactionEntity.STATE_COMPLETED) && transaction.PaycomTransactionId != request.Params.Id)
-                    throw new AppException("There is other active/completed transaction for this order.", -31008);
-            }
-
-            transaction = _context.Transactions.SingleOrDefault(x => x.PaycomTransactionId == request.Params.Id);
-            if (transaction != null)
-            {
-                if (transaction.State != TransactionEntity.STATE_CREATED)
-                {
-                    throw new AppException("Transaction found, but is not active.", -31008);
-                }
-                else if (transaction.isExpired())
+                if (transaction.isExpired())
                 {
                     Cancel(transaction, TransactionEntity.REASON_CANCELLED_BY_TIMEOUT);
                     throw new AppException("Transaction is expired.", -31008);
@@ -221,8 +191,10 @@ namespace tt.uz.Services
                         state = transaction.State
                     };
                 case TransactionEntity.STATE_COMPLETED:
+                    bool userBalance = _userService.SubstractAmountFromBalance(transaction.UserId, transaction.Amount);
+                    if (!userBalance)
+                        throw new AppException("Could not cancel transaction. User has not enough balance to cancel transaction.", -31007);
                     Cancel(transaction, request.Params.Reason);
-                    _userService.SubstractAmountFromBalance(transaction.UserId, transaction.Amount);
                     return new
                     {
                         cancel_time = DateHelper.GetTotalMillisecondsByDate(transaction.CancelTime),
@@ -230,7 +202,7 @@ namespace tt.uz.Services
                         state = transaction.State
                     };
                 default:
-                    throw new AppException("Could not cancel transaction. Order is delivered/Service is completed.", -31007);
+                    throw new AppException("Could not cancel transaction.", -31007);
             }
         }
 

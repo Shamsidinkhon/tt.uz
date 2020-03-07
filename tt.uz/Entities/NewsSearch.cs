@@ -11,7 +11,9 @@ namespace tt.uz.Entities
         public string Title { get; set; }
         public int CategoryId { get; set; }
         public int OwnerId { get; set; }
+        public int UserId { get; set; }
         public int Status { get; set; }
+        public int Type { get; set; }
 
         const int maxPageSize = 50;
         public int PageNumber { get; set; } = 1;

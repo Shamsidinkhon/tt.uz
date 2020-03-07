@@ -17,7 +17,7 @@ namespace tt.uz.Services
 {
     public interface IVerificationCodeService
     {
-        bool Verify(string value, string type, int code, bool isEmail);
+        User Verify(string value, string type, int code, bool isEmail);
         bool Send(VerificationCode vcode);
         bool SendPassword(User u, int tempPass, bool isEmail);
     }
@@ -36,7 +36,7 @@ namespace tt.uz.Services
             _cache = memoryCache;
             _mapper = mapper;
         }
-        public bool Verify(string value, string type, int code, bool isEmail)
+        public User Verify(string value, string type, int code, bool isEmail)
         {
             if (string.IsNullOrWhiteSpace(value))
                 throw new AppException("Email or Phone is required");
@@ -44,21 +44,21 @@ namespace tt.uz.Services
                 throw new AppException("Verification Type is required");
             var vcode = _context.VerificationCodes.FirstOrDefault(p => p.FieldType == type && p.FieldValue == value && p.Code == code && DateTime.Compare(p.ExpireDate, DateHelper.GetDate()) >= 0);
             if (vcode == null)
-                return false;
+                return null;
             var tempUser = isEmail ? _context.TempUsers.OrderByDescending(x => x.Id).FirstOrDefault(x => x.Email == value) : _context.TempUsers.OrderByDescending(x => x.Id).FirstOrDefault(x => x.Phone == value);
             var user = _mapper.Map<User>(tempUser);
 
             if(tempUser.ReferrerCode != 0){
                 var referrar = _context.Users.FirstOrDefault(x => x.ReferralCode == tempUser.ReferrerCode);
                 if (referrar != null) {
-                    referrar.Balance += 10;
+                    referrar.Balance += 10000;
                     _context.Users.Update(referrar);
                 }
             }
 
             _context.Users.Add(user);
             _context.SaveChanges();
-            return true;
+            return user;
         }
 
         public bool Send(VerificationCode vcode)

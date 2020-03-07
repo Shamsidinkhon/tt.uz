@@ -113,7 +113,7 @@ namespace tt.uz.Controllers
 
         [AllowAnonymous]
         [HttpPost("get-all")]
-        public PagedList<News> GetAll([FromBody]NewsSearch newsSearch)
+        public PagedListNews GetAll([FromBody]NewsSearch newsSearch)
         {
             int[] statuses = { News.ACTIVE };
 
@@ -121,8 +121,8 @@ namespace tt.uz.Controllers
             {
                 newsSearch.Status = News.ACTIVE;
             }
-            int userId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
-            var news = _newsService.GetAllByFilter(newsSearch, userId);
+            newsSearch.UserId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+            var news = _newsService.GetAllByFilter(newsSearch);
 
             var metadata = new
             {
@@ -134,15 +134,28 @@ namespace tt.uz.Controllers
                 news.HasPrevious
             };
             Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+            Response.Headers.Add("Access-Control-Expose-Headers", "*");
 
             return news;
         }
 
         [HttpPost("get-all-by-user")]
-        public List<News> GetAllByUser([FromBody]NewsSearch newsSearch)
+        public PagedListNews GetAllByUser([FromBody]NewsSearch newsSearch)
         {
             newsSearch.OwnerId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
-            return _newsService.GetAllByFilter(newsSearch, newsSearch.OwnerId);
+            var news = _newsService.GetAllByFilter(newsSearch);
+            var metadata = new
+            {
+                news.TotalCount,
+                news.PageSize,
+                news.CurrentPage,
+                news.TotalPages,
+                news.HasNext,
+                news.HasPrevious
+            };
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+            Response.Headers.Add("Access-Control-Expose-Headers", "*");
+            return news;
         }
 
         [HttpPost("post-favourite")]
@@ -177,9 +190,22 @@ namespace tt.uz.Controllers
         }
 
         [HttpPost("get-all-favourites")]
-        public List<News> GetAllFavourites()
+        public PagedListNews GetAllFavourites([FromBody]NewsSearch newsSearch)
         {
-            return _newsService.GetAllFavourites(Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
+            newsSearch.OwnerId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+            var news = _newsService.GetAllFavourites(newsSearch);
+            var metadata = new
+            {
+                news.TotalCount,
+                news.PageSize,
+                news.CurrentPage,
+                news.TotalPages,
+                news.HasNext,
+                news.HasPrevious
+            };
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+            Response.Headers.Add("Access-Control-Expose-Headers", "*");
+            return news;
         }
 
         [HttpPost("post-tariff")]
@@ -200,10 +226,22 @@ namespace tt.uz.Controllers
 
         [AllowAnonymous]
         [HttpPost("get-all-by-tariff")]
-        public List<News> GetAllByTariff(int type)
+        public PagedListNews GetAllByTariff([FromBody]NewsSearch newsSearch)
         {
-            int userId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
-            return _newsService.GetAllByTariff(type, userId);
+            newsSearch.OwnerId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+            var news = _newsService.GetAllByTariff(newsSearch);
+            var metadata = new
+            {
+                news.TotalCount,
+                news.PageSize,
+                news.CurrentPage,
+                news.TotalPages,
+                news.HasNext,
+                news.HasPrevious
+            };
+            Response.Headers.Add("X-Pagination", JsonConvert.SerializeObject(metadata));
+            Response.Headers.Add("Access-Control-Expose-Headers", "*");
+            return news;
         }
 
         [HttpPost("post-vendor-favourite")]
@@ -286,5 +324,43 @@ namespace tt.uz.Controllers
             return _newsService.Search(newsSearch);
         }
 
+        [AllowAnonymous]
+        [HttpGet("update-regions")]
+        public IActionResult UpdateRegions()
+        {
+            try
+            {
+                return Ok(_newsService.UpdateRegions());
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { code = false, message = ex.Message });
+            }
+
+        }
+        [AllowAnonymous]
+        [HttpGet("get-regions")]
+        public IActionResult GetRegions(string lang)
+        {
+            try
+            {
+                string[] langs = { "ru", "uz", "oz" };
+                if (string.IsNullOrEmpty(lang) || !langs.Contains(lang))
+                    lang = "ru";
+                IEnumerable<Region> regions = _newsService.GetRegions(lang);
+                return Ok(regions);
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new
+                {
+                    code = false,
+                    message = ex.Message
+                });
+            }
+
+        }
     }
 }

@@ -29,6 +29,8 @@ namespace tt.uz.Helpers
                 .HasIndex(p => p.TargetUserId);
             modelBuilder.Entity<NewsAttribute>()
                 .HasIndex(p => p.NewsId);
+            modelBuilder.Entity<Tariff>()
+                .HasIndex(p => p.NewsId);
         }
 
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
@@ -53,6 +55,7 @@ namespace tt.uz.Helpers
         public DbSet<NewsAttribute> NewsAttribute { get; set; }
         public DbSet<Contact> Contact { get; set; }
         public DbSet<TransactionEntity> Transactions { get; set; }
+        public DbSet<Region> Region { get; set; }
 
     }
 }

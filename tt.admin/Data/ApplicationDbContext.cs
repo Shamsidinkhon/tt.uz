@@ -19,6 +19,7 @@ namespace tt.admin.Data
         public DbSet<tt.uz.Entities.Location> Locations { get; set; }
         public DbSet<tt.uz.Entities.ContactDetail> ContactDetails { get; set; }
         public DbSet<tt.uz.Entities.Image> Images { get; set; }
+        public DbSet<tt.uz.Entities.User> User { get; set; }
 
     }
 }

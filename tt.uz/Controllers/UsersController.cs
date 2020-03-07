@@ -124,15 +124,46 @@ namespace tt.uz.Controllers
         {
             try
             {
-                return Ok(new
-                {
-                    code = _vcodeService.Verify(
+                var user = _vcodeService.Verify(
                     vCode.IsEmail ? vCode.Email : vCode.Phone,
                     vCode.IsEmail ? VerificationCode.EMAIL : VerificationCode.PHONE,
                     vCode.Code,
                     vCode.IsEmail
-                    ),
-                    message = "Verification completed"
+                    );
+
+                if (user == null)
+                    return Ok(new
+                    {
+                        code = false,
+                        message = "Verification failed"
+                    });
+
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                    new Claim(ClaimTypes.Name, user.Id.ToString())
+                    }),
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
+
+                // return basic user info (without password) and token to store client side
+                return Ok(new
+                {
+                    status = true,
+                    userData = new
+                    {
+                        Id = user.Id,
+                        Email = user.Email,
+                        Phone = user.Phone,
+                        ReferralCode = user.ReferralCode,
+                        Token = tokenString
+                    }
                 });
             }
             catch (AppException ex)

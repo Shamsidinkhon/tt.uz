@@ -52,7 +52,7 @@ namespace tt.uz.Services
 
         private List<Category> GetChilds(int parentId)
         {
-            return _context.Categories.Where(x => x.ParentId == parentId).ToList();
+            return _context.Categories.Where(x => x.ParentId == parentId && x.Status != 0).OrderBy(x => x.Sort).ToList();
         }
 
         public List<CoreAttribute> GetCategoryAttribites(int catId)
@@ -82,7 +82,7 @@ namespace tt.uz.Services
             string json = JsonConvert.SerializeObject(categories.ToList().ToArray());
             System.IO.File.WriteAllText(@"categories.json", json);
 
-            var cats = categories.Where(x => x.ParentId == null || x.ParentId.ToString() == "");
+            var cats = categories.Where(x => (x.ParentId == null || x.ParentId.ToString() == "") && x.Status != 0).OrderBy(x => x.Sort);
             foreach (Category cat in cats)
             {
                 cat.Children = GetChilds(cat.Id);
