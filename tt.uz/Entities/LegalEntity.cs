@@ -22,8 +22,10 @@ namespace tt.uz.Entities
         public int Region { get; set; }
         public int District { get; set; }
         public string Phone { get; set; }
-        public string Logo { get; set; }
+        public int Logo { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime UpdatedDate { get; set; }
+        [NotMapped]
+        public Image LogoImage { get; set; }
     }
 }

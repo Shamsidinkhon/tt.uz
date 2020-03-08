@@ -358,12 +358,35 @@ namespace tt.uz.Services
         {
             _context.LegalEntity.Add(entity);
             _context.SaveChanges();
+            entity.LogoImage = _context.Images.SingleOrDefault(x => x.ImageId == entity.Logo);
             return entity;
         }
 
         public List<LegalEntity> GetBusinessEntities(int userId)
         {
-            return _context.LegalEntity.Where(x => x.UserId == userId).ToList();
+            var entities = from e in _context.LegalEntity
+                           where e.UserId == userId
+
+                           join img in _context.Images on e.Logo equals img.ImageId
+                           into img
+                           from imgs in img.DefaultIfEmpty()
+                           select new LegalEntity()
+                           {
+                               Id = e.Id,
+                               UserId = e.UserId,
+                               Name = e.Name,
+                               Description = e.Description,
+                               Street = e.Street,
+                               Building = e.Building,
+                               Region = e.Region,
+                               District = e.District,
+                               Phone = e.Phone,
+                               Logo = e.Logo,
+                               CreatedDate = e.CreatedDate,
+                               UpdatedDate = e.UpdatedDate,
+                               LogoImage = img == null ? null : img.FirstOrDefault()
+                           };
+            return entities.ToList();
         }
     }
 }
