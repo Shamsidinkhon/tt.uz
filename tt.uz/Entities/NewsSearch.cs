@@ -31,5 +31,19 @@ namespace tt.uz.Entities
                 _pageSize = (value > maxPageSize) ? maxPageSize : value;
             }
         }
+        public PriceSearchClass Price {get; set;}
+
+        public class PriceSearchClass
+        {
+            public decimal AmountFrom { get; set; }
+            public decimal AmountTo { get; set; }
+            public int Currency { get; set; }
+            public bool Exchange { get; set; }
+            public bool Free { get; set; }
+            public bool Negotiable { get; set; }
+
+        }
     }
+
+
 }

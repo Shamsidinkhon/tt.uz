@@ -174,32 +174,9 @@ namespace tt.uz.Services
                        };
 
 
-            if (newsSearch.OwnerId > 0)
-            {
-                news = news.Where(x => x.OwnerId == newsSearch.OwnerId);
-            }
 
-            int[] statuses = { News.NEW, News.ACTIVE, News.ARCHIVE, News.REJECTED };
 
-            if (statuses.Contains(newsSearch.Status))
-            {
-                news = news.Where(x => x.Status == newsSearch.Status);
-            }
-
-            if (newsSearch.Id > 0)
-            {
-                news = news.Where(x => x.Id == newsSearch.Id);
-            }
-
-            if (newsSearch.CategoryId > 0)
-            {
-                news = news.Where(x => x.CategoryId == newsSearch.CategoryId);
-            }
-
-            if (!string.IsNullOrEmpty(newsSearch.Title))
-            {
-                news = news.Where(x => x.Title.Contains(newsSearch.Title));
-            }
+            news = Query(news, newsSearch);
             news = news.GroupBy(item => item.Id).Select(group => group.FirstOrDefault());
             return PagedListNews.ToPagedList(news, newsSearch.PageNumber, newsSearch.PageSize, _context);
         }
@@ -259,21 +236,7 @@ namespace tt.uz.Services
                            Favourite = true,
                        };
 
-            if (newsSearch.Id > 0)
-            {
-                news = news.Where(x => x.Id == newsSearch.Id);
-            }
-
-            if (newsSearch.CategoryId > 0)
-            {
-                news = news.Where(x => x.CategoryId == newsSearch.CategoryId);
-            }
-
-            if (!string.IsNullOrEmpty(newsSearch.Title))
-            {
-                news = news.Where(x => x.Title.Contains(newsSearch.Title));
-            }
-
+            news = Query(news, newsSearch);
 
             news = news.GroupBy(item => item.Id).Select(group => group.FirstOrDefault());
             return PagedListNews.ToPagedList(news, newsSearch.PageNumber, newsSearch.PageSize, _context);
@@ -345,20 +308,7 @@ namespace tt.uz.Services
                            Favourite = fav == null ? false : true,
                        };
 
-            if (newsSearch.Id > 0)
-            {
-                news = news.Where(x => x.Id == newsSearch.Id);
-            }
-
-            if (newsSearch.CategoryId > 0)
-            {
-                news = news.Where(x => x.CategoryId == newsSearch.CategoryId);
-            }
-
-            if (!string.IsNullOrEmpty(newsSearch.Title))
-            {
-                news = news.Where(x => x.Title.Contains(newsSearch.Title));
-            }
+            news = Query(news, newsSearch);
 
             news = news.GroupBy(item => item.Id).Select(group => group.FirstOrDefault());
             return PagedListNews.ToPagedList(news, newsSearch.PageNumber, newsSearch.PageSize, _context);
@@ -456,6 +406,46 @@ namespace tt.uz.Services
         {
             var regions = JsonConvert.DeserializeObject<IEnumerable<Region>>(System.IO.File.ReadAllText(@"regions_" + lang + ".json"));
             return _mapper.Map<IEnumerable<Region>>(regions);
+        }
+
+        protected IQueryable<News> Query(IQueryable<News> news, NewsSearch newsSearch)
+        {
+            if (newsSearch.Id > 0)
+            {
+                news = news.Where(x => x.Id == newsSearch.Id);
+            }
+
+            if (newsSearch.CategoryId > 0)
+            {
+                news = news.Where(x => x.CategoryId == newsSearch.CategoryId);
+            }
+
+            if (!string.IsNullOrEmpty(newsSearch.Title))
+            {
+                news = news.Where(x => x.Title.Contains(newsSearch.Title));
+            }
+
+            if (newsSearch.OwnerId > 0)
+            {
+                news = news.Where(x => x.OwnerId == newsSearch.OwnerId);
+            }
+
+            int[] statuses = { News.NEW, News.ACTIVE, News.ARCHIVE, News.REJECTED, News.DELETED };
+
+            if (statuses.Contains(newsSearch.Status))
+            {
+                news = news.Where(x => x.Status == newsSearch.Status);
+            }
+
+            if (newsSearch.Price != null)
+            {
+                if (newsSearch.Price.AmountFrom > 0)
+                {
+                    news = news.Where(x => x.Price.Amount >= newsSearch.Price.AmountFrom);
+                }
+            }
+
+            return news;
         }
     }
 }
