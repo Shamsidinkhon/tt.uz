@@ -33,6 +33,7 @@ namespace tt.uz.Entities
         }
         public PriceSearchClass Price {get; set;}
         public LocationInnerClass Location {get; set;}
+        public List<AttributeInnerClass> Attributes { get; set; }
 
         public class PriceSearchClass
         {
@@ -50,6 +51,13 @@ namespace tt.uz.Entities
             public int DistrictId { get; set; }
             public string Longtitude { get; set; }
             public string Latitude { get; set; }
+        }
+        public class AttributeInnerClass
+        {
+            public int AttributeId { get; set; }
+            public int ValueFrom { get; set; }
+            public int ValueTo { get; set; }
+            public string Value { get; set; }
         }
     }
 
