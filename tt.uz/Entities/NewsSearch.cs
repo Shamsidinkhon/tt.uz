@@ -32,6 +32,7 @@ namespace tt.uz.Entities
             }
         }
         public PriceSearchClass Price {get; set;}
+        public LocationInnerClass Location {get; set;}
 
         public class PriceSearchClass
         {
@@ -42,6 +43,13 @@ namespace tt.uz.Entities
             public bool Free { get; set; }
             public bool Negotiable { get; set; }
 
+        }
+        public class LocationInnerClass
+        {
+            public int RegionId { get; set; }
+            public int DistrictId { get; set; }
+            public string Longtitude { get; set; }
+            public string Latitude { get; set; }
         }
     }
 

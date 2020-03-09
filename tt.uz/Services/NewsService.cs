@@ -443,6 +443,34 @@ namespace tt.uz.Services
                 {
                     news = news.Where(x => x.Price.Amount >= newsSearch.Price.AmountFrom);
                 }
+                if (newsSearch.Price.AmountTo > 0)
+                {
+                    news = news.Where(x => x.Price.Amount <= newsSearch.Price.AmountTo);
+                }
+                if (newsSearch.Price.Currency > 0)
+                {
+                    news = news.Where(x => x.Price.Currency == newsSearch.Price.Currency);
+                }
+            }
+
+            if (newsSearch.Location != null)
+            {
+                if (newsSearch.Location.RegionId > 0)
+                {
+                    news = news.Where(x => x.Location.RegionId == newsSearch.Location.RegionId);
+                }
+                if (newsSearch.Location.DistrictId > 0)
+                {
+                    news = news.Where(x => x.Location.DistrictId == newsSearch.Location.DistrictId);
+                }
+                if (!string.IsNullOrEmpty(newsSearch.Location.Longtitude))
+                {
+                    news = news.Where(x => x.Location.Longtitude.Contains(newsSearch.Location.Longtitude));
+                }
+                if (!string.IsNullOrEmpty(newsSearch.Location.Latitude))
+                {
+                    news = news.Where(x => x.Location.Latitude.Contains(newsSearch.Location.Latitude));
+                }
             }
 
             return news;

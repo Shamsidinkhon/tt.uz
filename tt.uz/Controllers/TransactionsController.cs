@@ -30,7 +30,7 @@ namespace tt.uz.Controllers
             try
             {
                 new Merchant().Authorize(Request, Configuration);
-                return Ok(new { result = _paymeService.ProcessTransaction(request), id = request.Id });
+                return Ok(new { result = _paymeService.ProcessTransaction(request)});
             }
             catch (AppException ex)
             {

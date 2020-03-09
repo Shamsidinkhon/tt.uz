@@ -61,7 +61,7 @@ namespace tt.uz.Helpers
             // Unix timestamp is seconds past epoch
             DateTime dtDateTime = getEpoch();
             TimeSpan diff = date - dtDateTime;
-            return Convert.ToInt64(diff.TotalMilliseconds);
+            return Convert.ToInt64(diff.TotalMilliseconds) < 0 ? 0 : Convert.ToInt64(diff.TotalMilliseconds);
         }
 
         public static DateTime getEpoch(){
