@@ -31,6 +31,8 @@ namespace tt.uz.Services
         bool SubstractAmountFromBalance(int userId, int amount);
         LegalEntity AddBusinessEntity(LegalEntity entity);
         List<LegalEntity> GetBusinessEntities(int userId);
+        LegalEntity GetBusinessEntity(int Id, int userId);
+        LegalEntity EditBusinessEntity(int Id, LegalEntityDto legalEntityDto, int userId);
     }
 
     public class UserService : IUserService
@@ -358,6 +360,40 @@ namespace tt.uz.Services
         {
             _context.LegalEntity.Add(entity);
             _context.SaveChanges();
+            entity.LogoImage = _context.Images.SingleOrDefault(x => x.ImageId == entity.Logo);
+            return entity;
+        }
+
+        public LegalEntity EditBusinessEntity(int Id, LegalEntityDto legalEntityDto, int userId)
+        {
+            var entity = _context.LegalEntity.SingleOrDefault(x => x.Id == Id);
+
+            if (entity == null)
+            {
+                throw new AppException("Business Entity Not Found");
+            }
+            if(entity.UserId != userId)
+            {
+                throw new AppException("User is not an owner of this Business Entity");
+            }
+            _mapper.Map<LegalEntityDto, LegalEntity>(legalEntityDto, entity);
+            _context.LegalEntity.Update(entity);
+            entity.LogoImage = _context.Images.SingleOrDefault(x => x.ImageId == entity.Logo);
+            return entity;
+        }
+
+        public LegalEntity GetBusinessEntity(int Id, int userId)
+        {
+            var entity = _context.LegalEntity.SingleOrDefault(x => x.Id == Id);
+
+            if (entity == null)
+            {
+                throw new AppException("Business Entity Not Found");
+            }
+            if (entity.UserId != userId)
+            {
+                throw new AppException("User is not an owner of this Business Entity");
+            }
             entity.LogoImage = _context.Images.SingleOrDefault(x => x.ImageId == entity.Logo);
             return entity;
         }

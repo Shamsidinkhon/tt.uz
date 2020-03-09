@@ -344,10 +344,43 @@ namespace tt.uz.Controllers
             }
         }
         [HttpGet("get-business-entities")]
-        public List<LegalEntity> GetBusinessEntities()
+        public IActionResult GetBusinessEntities()
         {
-            var entities = _userService.GetBusinessEntities(Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name));
-            return entities;
+            try
+            {
+                return Ok(_userService.GetBusinessEntities(Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name)));
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+        }
+        [HttpGet("get-business-entity")]
+        public IActionResult GetBusinessEntity(int Id)
+        {
+            try
+            {
+                return Ok(_userService.GetBusinessEntity(Id, Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name)));
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
+        }
+        [HttpPost("edit-business-entity")]
+        public IActionResult EditBusinessEntity([FromBody]LegalEntityDto legalEntityDto, int Id)
+        {
+            try
+            {
+                return Ok(_userService.EditBusinessEntity(Id, legalEntityDto, Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name)));
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return Ok(new { status = false, message = ex.Message });
+            }
         }
     }
 }
