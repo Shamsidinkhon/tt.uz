@@ -410,27 +410,30 @@ namespace tt.uz.Services
 
         protected IQueryable<News> Query(IQueryable<News> news, NewsSearch newsSearch)
         {
-            string AttributeConditions = "";
             if (newsSearch.Attributes != null && newsSearch.Attributes.Count > 0)
-            {
-                foreach (var attr in newsSearch.Attributes)
-                {
-                    if (!string.IsNullOrEmpty(attr.Value))
-                    {
-                        AttributeConditions += AttributeConditions + "AND ()";
-                    }
-                    else if (attr.ValueFrom > 0 && attr.ValueTo > 0)
-                    {
-
-                    }
-                }
-            }
-            if (!string.IsNullOrEmpty(AttributeConditions))
             {
                 news = from n in news
                        join atr in _context.NewsAttribute on n.Id equals atr.NewsId
                        select n;
+                foreach (var attr in newsSearch.Attributes)
+                {
+                    if (!string.IsNullOrEmpty(attr.Value))
+                    {
+                        news = from n in news
+                               join atr in _context.NewsAttribute on n.Id equals atr.NewsId
+                               where atr.AttributeId == attr.AttributeId && atr.Value == attr.Value
+                               select n;
+                    }
+                    else if (attr.ValueFrom > 0 && attr.ValueTo > 0)
+                    {
+                        news = from n in news
+                               join atr in _context.NewsAttribute on n.Id equals atr.NewsId
+                               where atr.AttributeId == attr.AttributeId && Convert.ToInt32(atr.Value) >= attr.ValueFrom && Convert.ToInt32(atr.Value) <= attr.ValueTo
+                               select n;
+                    }
+                }
             }
+
 
             if (newsSearch.Id > 0)
             {

@@ -71,7 +71,7 @@ namespace tt.uz.Services
                 cancel_time = DateHelper.GetTotalMillisecondsByDate(transaction.CancelTime),
                 transaction = transaction.Id.ToString(),
                 state = transaction.State,
-                reason = transaction.Reason
+                reason = transaction.Reason == 0 ? (int?)null : transaction.Reason
             };
         }
         private object CreateTransaction(Request request)
