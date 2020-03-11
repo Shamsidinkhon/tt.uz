@@ -192,7 +192,7 @@ namespace tt.uz.Controllers
         [HttpPost("get-all-favourites")]
         public PagedListNews GetAllFavourites([FromBody]NewsSearch newsSearch)
         {
-            newsSearch.OwnerId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+            newsSearch.UserId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
             var news = _newsService.GetAllFavourites(newsSearch);
             var metadata = new
             {
@@ -228,7 +228,7 @@ namespace tt.uz.Controllers
         [HttpPost("get-all-by-tariff")]
         public PagedListNews GetAllByTariff([FromBody]NewsSearch newsSearch)
         {
-            newsSearch.OwnerId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
+            newsSearch.UserId = Convert.ToInt32(_httpContextAccessor.HttpContext.User.Identity.Name);
             var news = _newsService.GetAllByTariff(newsSearch);
             var metadata = new
             {
