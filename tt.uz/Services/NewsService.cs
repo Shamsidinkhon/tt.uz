@@ -43,7 +43,7 @@ namespace tt.uz.Services
         }
         public News Create(News news, string imageIds)
         {
-            news.Description = news.Description.Replace("\n", "<br />");
+            //news.Description = news.Description.Replace("\n", "<br />");
             _context.News.Add(news);
             _context.SaveChanges();
             var ids = imageIds.Split(',').Select(Int32.Parse).ToList();
