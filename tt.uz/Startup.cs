@@ -116,8 +116,9 @@ namespace tt.uz
             }
 
             app.UseHttpsRedirection();
+            //string[] origins = { "https://localhost:3000", "https://tt.uz/", "http://tt.uz/", "http://torguemtut.uz/", "https://torguemtut.uz/" };
             app.UseCors(
-                options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().AllowCredentials().Build()
+                options => options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().Build()
             );
             app.UseStaticFiles();
             app.UseStaticFiles(new StaticFileOptions()
