@@ -31,6 +31,8 @@ namespace tt.uz.Services
         List<Category> Search(NewsSearch newsSearch);
         bool UpdateRegions();
         IEnumerable<Region> GetRegions(string lang = "ru");
+        News Update(NewsDTO newsDTO, int Id, int userId);
+        News ChangeStatus(int Id, int status, int userId);
     }
     public class NewsService : INewsService
     {
@@ -65,6 +67,90 @@ namespace tt.uz.Services
 
             _context.SaveChanges();
             news.Images = _context.Images.Where(x => x.NewsId == news.Id).ToList();
+            return news;
+        }
+
+        public News Update(NewsDTO newsDTO, int Id, int userId)
+        {
+            var news = _context.News.SingleOrDefault(x => x.Id == Id);
+            if (news == null)
+                throw new AppException("News not found");
+
+            if (news.OwnerId != userId)
+                throw new AppException("User is not owner of this news");
+
+            if (news.Status != News.ARCHIVE)
+                throw new AppException("Action is not allowed");
+
+            _mapper.Map(newsDTO, news);
+            _context.News.Update(news);
+
+            var ids = newsDTO.ImageIds.Split(',').Select(Int32.Parse).ToList();
+            foreach (int id in ids)
+            {
+                var image = _context.Images.SingleOrDefault(x => x.ImageId == id);
+                if (image.NewsId == news.Id)
+                    continue;
+                if (image != null && image.NewsId == 0)
+                {
+                    image.NewsId = news.Id;
+                    _context.Images.Update(image);
+                }
+            }
+
+            foreach (NewsAttribute newsAttribute in news.NewsAttribute)
+            {
+                var attr = _context.NewsAttribute.SingleOrDefault(x => x.NewsId == news.Id && x.AttributeId == newsAttribute.AttributeId);
+                if (attr == null)
+                {
+                    newsAttribute.NewsId = news.Id;
+                    _context.NewsAttribute.Add(newsAttribute);
+                }
+                else
+                {
+                    if (attr.Value != newsAttribute.Value)
+                    {
+                        attr.Value = newsAttribute.Value;
+                        _context.NewsAttribute.Update(attr);
+                    }
+                }
+            }
+
+            _context.SaveChanges();
+            news.Images = _context.Images.Where(x => x.NewsId == news.Id).ToList();
+            return news;
+        }
+
+        public News ChangeStatus(int Id, int status, int userId)
+        {
+            var news = _context.News.SingleOrDefault(x => x.Id == Id);
+            if (news == null)
+                throw new AppException("News not found");
+
+            if (news.OwnerId != userId)
+                throw new AppException("User is not owner of this news");
+
+            //int[] statuses = { News.ACTIVE, News.ARCHIVE };
+
+            //if (!statuses.Contains(news.Status))
+            //{
+            //    throw new AppException("Action is not allowed");
+            //}
+
+            if (news.Status == News.ACTIVE && status == News.ARCHIVE)
+            {
+                news.Status = News.ARCHIVE;
+                _context.News.Update(news);
+            }
+
+            int[] toStatuses = { News.DELETED, News.NEW };
+            if (news.Status == News.ARCHIVE && toStatuses.Contains(status))
+            {
+                news.Status = status;
+                _context.News.Update(news);
+            }
+
+            _context.SaveChanges();
             return news;
         }
 
@@ -442,7 +528,7 @@ namespace tt.uz.Services
                     {
                         news = from n in news
                                join atr in _context.NewsAttribute on n.Id equals atr.NewsId
-                               where atr.AttributeId == attr.AttributeId &&  Convert.ToInt32(atr.Value) <= attr.ValueTo
+                               where atr.AttributeId == attr.AttributeId && Convert.ToInt32(atr.Value) <= attr.ValueTo
                                select n;
                     }
                 }
