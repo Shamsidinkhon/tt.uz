@@ -137,14 +137,15 @@ namespace tt.uz.Services
             //    throw new AppException("Action is not allowed");
             //}
 
-            if (news.Status == News.ACTIVE && status == News.ARCHIVE)
+            int[] toStatuses = { News.ARCHIVE, News.NEW };
+            if (news.Status == News.ACTIVE && toStatuses.Contains(status))
             {
-                news.Status = News.ARCHIVE;
+                news.Status = status;
                 _context.News.Update(news);
             }
 
-            int[] toStatuses = { News.DELETED, News.NEW };
-            if (news.Status == News.ARCHIVE && toStatuses.Contains(status))
+            int[] toStatuses2 = { News.DELETED, News.NEW };
+            if (news.Status == News.ARCHIVE && toStatuses2.Contains(status))
             {
                 news.Status = status;
                 _context.News.Update(news);
