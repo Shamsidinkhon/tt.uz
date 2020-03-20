@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using tt.admin.Data;
+using tt.admin.Models;
 using tt.uz.Entities;
 
 namespace tt.admin.Controllers
@@ -22,9 +23,27 @@ namespace tt.admin.Controllers
         }
 
         // GET: AttributeLinks
-        public async Task<IActionResult> Index()
+        public ActionResult Index()
         {
-            return View(await _context.AttributeLink.ToListAsync());
+            var groups = from l in _context.AttributeLink
+
+                         join c in _context.CoreAttribute on l.AttributeId equals c.Id
+                         into ca
+                         from c in ca
+
+                         join cat in _context.Categories on l.TypeId equals cat.AttributeType
+                         into category
+                         from cat in category.DefaultIfEmpty()
+
+                         group new { Attibutes = ca, Categories = category } by l.TypeId into grouped
+                         orderby grouped.Key
+                         select new AttributeLinkViewModel() {
+                             Type = grouped.Key,
+                             Attributes = grouped.SelectMany(x => x.Attibutes).Distinct().ToList(),
+                             Categories = grouped.SelectMany(x => x.Categories).Distinct().ToList()
+                         };
+
+            return View(groups.ToList());
         }
 
         // GET: AttributeLinks/Details/5
@@ -48,7 +67,36 @@ namespace tt.admin.Controllers
         // GET: AttributeLinks/Create
         public IActionResult Create()
         {
+            ViewData["AttributeId"] = new SelectList(_context.CoreAttribute, "Id", "Title");
             return View();
+        }
+
+        public IActionResult AddCategory(int Id)
+        {
+            ViewData["Categories"] = new SelectList(_context.Categories, "Id", "Name");
+            CategoryPostModel model = new CategoryPostModel
+            {
+                TypeId = Id
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult AddCategory([Bind("CategoryId,TypeId")] CategoryPostModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var cat = _context.Categories.SingleOrDefault(x => x.Id == model.CategoryId);
+                if (cat != null)
+                {
+                    cat.AttributeType = model.TypeId;
+                    _context.Categories.Update(cat);
+                    _context.SaveChanges();
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(model);
         }
 
         // POST: AttributeLinks/Create
@@ -144,6 +192,19 @@ namespace tt.admin.Controllers
             var attributeLink = await _context.AttributeLink.FindAsync(id);
             _context.AttributeLink.Remove(attributeLink);
             await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet, ActionName("DeleteCategoryType")]
+        public ActionResult DeleteCategoryType(int id)
+        {
+            var cat = _context.Categories.SingleOrDefault(x => x.Id == id);
+            if (cat != null)
+            {
+                cat.AttributeType = 0;
+                _context.Categories.Update(cat);
+                _context.SaveChanges();
+            }
             return RedirectToAction(nameof(Index));
         }
 

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<tt.uz.Entities.AttributeLink>
+﻿@model List<AttributeLinkViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -8,35 +8,52 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create">Create Link</a> |
+    <a asp-action="DeleteLink">Delete Link</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.TypeId)
+                Type
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AttributeId)
+                Categories
             </th>
-            <th></th>
+            <th>
+                Attributes
+            </th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.TypeId)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AttributeId)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Type)
+                </td>
+                <td>
+                    @foreach (var cat in item.Categories)
+                    {
+                        @Html.Raw(cat.Name);
+                        @Html.ActionLink(" Remove", "DeleteCategoryType", "AttributeLinks",
+                        new
+                             {
+                            Id = cat.Id
+                        });
+                        @Html.Raw("<br />");
+                    }
+                </td>
+                <td>
+                    @foreach (var ca in item.Attributes)
+                    {
+                        @Html.Raw(ca.Title + "<br />");
+                    }
+                </td>
+                <td>
+                    <a asp-action="AddCategory" asp-route-id="@item.Type">Add Category</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

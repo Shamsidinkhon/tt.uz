@@ -1,32 +1,32 @@
-﻿@model tt.uz.Entities.AttributeLink
+﻿@model CategoryPostModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Add Category";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Create</h1>
+    <h1>Add Category</h1>
 
 <h4>AttributeLink</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="AddCategory">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="TypeId" class="control-label"></label>
-                <input asp-for="TypeId" class="form-control" />
+                <input asp-for="TypeId" class="form-control" readonly/>
                 <span asp-validation-for="TypeId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="AttributeId" class="control-label"></label>
-                <select asp-for="AttributeId" class="form-control" asp-items="ViewBag.AttributeId">
+                <label asp-for="CategoryId" class="control-label">Category</label>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.Categories">
                     <option>Select ...</option>
                 </select>
-                <span asp-validation-for="AttributeId" class="text-danger"></span>
+                <span asp-validation-for="CategoryId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Add Category" class="btn btn-primary" />
             </div>
         </form>
     </div>
